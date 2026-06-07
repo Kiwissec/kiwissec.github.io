@@ -1,10 +1,13 @@
 ---
 import NewsCard from "./NewsCard.astro";
-import { news } from "../data/site";
+import { getCollection } from "astro:content";
 import { withBase } from "../lib/site";
 
-const tags = ["全部", ...Array.from(new Set(news.map((n) => n.tag)))];
-const count = (t: string) => news.filter((n) => n.tag === t).length;
+const news = (await getCollection("news")).sort((a, b) =>
+  b.data.date.localeCompare(a.data.date),
+);
+const tags = ["全部", ...Array.from(new Set(news.map((n) => n.data.tag)))];
+const count = (t: string) => news.filter((n) => n.data.tag === t).length;
 ---
 
 <header class="page-head">
@@ -41,7 +44,7 @@ const count = (t: string) => news.filter((n) => n.tag === t).length;
     </div>
 
     <div class="news-grid">
-      {news.map((n) => <NewsCard item={n} />)}
+      {news.map((n) => <NewsCard item={n.data} />)}
     </div>
   </div>
 </section>

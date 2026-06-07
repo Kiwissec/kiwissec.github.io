@@ -1,6 +1,10 @@
 ---
-import { services } from "../data/site";
+import { getCollection } from "astro:content";
 import { withBase } from "../lib/site";
+
+const services = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <header class="page-head">
@@ -26,15 +30,15 @@ import { withBase } from "../lib/site";
         <article class="svc-row" id={s.id}>
           <div class="svc-aside">
             <span class="svc-icon">
-              <i class={s.icon} />
+              <i class={s.data.icon} />
             </span>
           </div>
           <div class="svc-body">
-            <h2>{s.name}</h2>
-            <p class="svc-desc">{s.desc}</p>
+            <h2>{s.data.name}</h2>
+            <p class="svc-desc">{s.data.desc}</p>
             <div class="svc-points-head">服務內容</div>
             <ul class="svc-points">
-              {s.points.map((p) => (
+              {s.data.points.map((p) => (
                 <li>
                   <i class="fa-solid fa-circle-check" />
                   <span>{p}</span>
@@ -42,7 +46,7 @@ import { withBase } from "../lib/site";
               ))}
             </ul>
             <div class="svc-cta">
-              {s.cta.map((c) => (
+              {s.data.cta.map((c) => (
                 <a
                   class={"btn " + (c.primary ? "btn-primary" : "btn-ghost")}
                   href={withBase(c.href)}

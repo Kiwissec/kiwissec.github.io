@@ -1,6 +1,10 @@
 ---
 import SectionHead from "./SectionHead.astro";
-import { testimonials } from "../data/site";
+import { getCollection } from "astro:content";
+
+const testimonials = (await getCollection("testimonials")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <section class="section section-tint" id="voices">
@@ -19,12 +23,12 @@ import { testimonials } from "../data/site";
         testimonials.map((t) => (
           <figure class="voice-card">
             <span class="voice-quote" aria-hidden="true">&ldquo;</span>
-            <blockquote>{t.q}</blockquote>
+            <blockquote>{t.data.q}</blockquote>
             <figcaption class="voice-by">
               <span class="voice-avatar">
-                <i class={t.icon} />
+                <i class={t.data.icon} />
               </span>
-              <span class="voice-role">{t.who}</span>
+              <span class="voice-role">{t.data.who}</span>
             </figcaption>
           </figure>
         ))

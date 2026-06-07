@@ -1,7 +1,11 @@
 ---
 import SectionHead from "./SectionHead.astro";
-import { services } from "../data/site";
+import { getCollection } from "astro:content";
 import { withBase } from "../lib/site";
+
+const services = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <section class="section" id="services">
@@ -12,10 +16,10 @@ import { withBase } from "../lib/site";
         services.map((s) => (
           <a class="prod prod-link" href={withBase("/services#" + s.id)}>
             <div class="prod-disk">
-              <i class={s.icon} />
+              <i class={s.data.icon} />
             </div>
-            <h3>{s.name}</h3>
-            <p>{s.short}</p>
+            <h3>{s.data.name}</h3>
+            <p>{s.data.short}</p>
             <span class="prod-go">
               了解更多 <i class="fa-solid fa-arrow-right" />
             </span>

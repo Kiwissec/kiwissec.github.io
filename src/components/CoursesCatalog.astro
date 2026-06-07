@@ -1,11 +1,16 @@
 ---
-import { courseCats, courses, courseIntro } from "../data/site";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { courseCats, courseIntro } from "../data/site";
 import { withBase } from "../lib/site";
+
+const courses = (await getCollection("courses")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 
 const catLabel = (id: string) =>
   courseCats.find((c) => c.id === id)?.label ?? "";
-const searchText = (c: (typeof courses)[number]) =>
-  (c.title + " " + c.desc + " " + c.tags.join(" ")).toLowerCase();
+const searchText = (c: CollectionEntry<"courses">) =>
+  (c.data.title + " " + c.data.desc + " " + c.data.tags.join(" ")).toLowerCase();
 ---
 
 <header class="page-head">
@@ -50,7 +55,7 @@ const searchText = (c: (typeof courses)[number]) =>
             {c.label}
             {c.id !== "all" && (
               <span class="tab-count">
-                {courses.filter((x) => x.cat === c.id).length}
+                {courses.filter((x) => x.data.cat === c.id).length}
               </span>
             )}
           </button>
@@ -64,21 +69,21 @@ const searchText = (c: (typeof courses)[number]) =>
       {
         courses.map((c) => (
           <article
-            class={"course-card cat-" + c.cat}
-            data-cat={c.cat}
+            class={"course-card cat-" + c.data.cat}
+            data-cat={c.data.cat}
             data-search={searchText(c)}
           >
             <div class="course-card-top">
-              <span class="course-cat">{catLabel(c.cat)}</span>
+              <span class="course-cat">{catLabel(c.data.cat)}</span>
               <span class="course-hours">
                 <i class="fa-regular fa-clock" aria-hidden="true" />
-                {c.hours}
+                {c.data.hours}
               </span>
             </div>
-            <h3 class="course-title">{c.title}</h3>
-            <p class="course-desc">{c.desc}</p>
+            <h3 class="course-title">{c.data.title}</h3>
+            <p class="course-desc">{c.data.desc}</p>
             <div class="course-tags">
-              {c.tags.map((t) => (
+              {c.data.tags.map((t) => (
                 <span class="course-tag">#{t}</span>
               ))}
             </div>
@@ -105,7 +110,9 @@ const searchText = (c: (typeof courses)[number]) =>
 </section>
 
 <script>
-  const VALID = ["all", "awareness", "offensive", "defensive"];
+  import { COURSE_CAT_IDS } from "../data/course-cats";
+
+  const VALID = ["all", ...COURSE_CAT_IDS];
   const root = document.getElementById("all-courses");
   if (root) {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>(".course-tab"));

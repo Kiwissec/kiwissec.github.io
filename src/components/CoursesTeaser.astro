@@ -1,20 +1,12 @@
 ---
 import SectionHead from "./SectionHead.astro";
-import { courseCats, courses, courseIntro } from "../data/site";
+import { getCollection } from "astro:content";
+import { COURSE_CAT_IDS, COURSE_CAT_META } from "../data/course-cats";
+import { courseIntro } from "../data/site";
 import { withBase } from "../lib/site";
 
-const cats = courseCats.filter((c) => c.id !== "all");
-const count = (id: string) => courses.filter((c) => c.cat === id).length;
-const icon: Record<string, string> = {
-  awareness: "fa-solid fa-user-shield",
-  offensive: "fa-solid fa-bug",
-  defensive: "fa-solid fa-shield-halved",
-};
-const blurb: Record<string, string> = {
-  awareness: "全員適用、無技術門檻，建立日常防護直覺",
-  offensive: "技術人員的滲透測試與紅隊實戰",
-  defensive: "防禦維運、DevSecOps、雲端與事件應變",
-};
+const courses = await getCollection("courses");
+const count = (id: string) => courses.filter((c) => c.data.cat === id).length;
 ---
 
 <section class="section" id="courses">
@@ -23,14 +15,14 @@ const blurb: Record<string, string> = {
     <p class="courses-intro">{courseIntro}</p>
     <div class="cat-grid">
       {
-        cats.map((c) => (
-          <a class={"cat-card cat-" + c.id} href={withBase("/courses?cat=" + c.id)}>
+        COURSE_CAT_IDS.map((id) => (
+          <a class={"cat-card cat-" + id} href={withBase("/courses?cat=" + id)}>
             <span class="cat-card-ico">
-              <i class={icon[c.id]} />
+              <i class={COURSE_CAT_META[id].icon} />
             </span>
-            <span class="cat-card-name">{c.label}</span>
-            <span class="cat-card-desc">{blurb[c.id]}</span>
-            <span class="cat-card-count">{count(c.id)} 門課程</span>
+            <span class="cat-card-name">{COURSE_CAT_META[id].label}</span>
+            <span class="cat-card-desc">{COURSE_CAT_META[id].blurb}</span>
+            <span class="cat-card-count">{count(id)} 門課程</span>
             <span class="cat-card-go">
               查看課程 <i class="fa-solid fa-arrow-right" />
             </span>

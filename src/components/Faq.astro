@@ -1,0 +1,54 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { faq } from "../data/site";
+---
+
+<section class="section" id="faq">
+  <div class="wrap">
+    <SectionHead zh="常見問題" en="FAQ" />
+    <div class="faq">
+      {
+        faq.map((f, i) => (
+          <div class={"faq-item" + (i === 0 ? " open" : "")}>
+            <button class="faq-q" aria-expanded={i === 0 ? "true" : "false"}>
+              <span>{f.q}</span>
+              <i class="fa-solid fa-plus" />
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">{f.a}</div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>(".faq .faq-item"),
+  );
+  const setOpen = (item: HTMLElement, open: boolean) => {
+    const panel = item.querySelector<HTMLElement>(".faq-a");
+    const q = item.querySelector<HTMLButtonElement>(".faq-q");
+    item.classList.toggle("open", open);
+    q?.setAttribute("aria-expanded", String(open));
+    if (panel) panel.style.maxHeight = open ? panel.scrollHeight + "px" : "0";
+  };
+
+  items.forEach((item) => {
+    const q = item.querySelector<HTMLButtonElement>(".faq-q");
+    q?.addEventListener("click", () => {
+      const willOpen = !item.classList.contains("open");
+      items.forEach((other) => setOpen(other, other === item && willOpen));
+    });
+    // Apply the initial open state (first item) so its panel has a height.
+    setOpen(item, item.classList.contains("open"));
+  });
+
+  // Re-measure the open panel on resize (wrapping can change its height).
+  window.addEventListener("resize", () => {
+    const open = items.find((i) => i.classList.contains("open"));
+    if (open) setOpen(open, true);
+  });
+</script>

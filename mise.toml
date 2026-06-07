@@ -1,0 +1,4 @@
+# Astro 以 Node 為 runtime。釘選具體 LTS 版本（exact pin）作為環境 single source
+# of truth；Node 24 LTS patch 更新時手動 bump（需自動跟進 patch 可改為 "24"）。
+[tools]
+node = "24.15.0"

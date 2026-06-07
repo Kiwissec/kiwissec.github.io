@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+# 以 GitHub Actions 建置 Astro 靜態站並部署到 GitHub Pages（站台根目錄，base '/'）。
+# 推送到 main 即自動建置部署；亦可手動觸發。
+# 需於 Settings → Pages 將 Source 設為 "GitHub Actions"。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時間只跑一個部署；不取消進行中的部署，讓它完成。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build with Astro
+        uses: withastro/action@v6
+        with:
+          node-version: 24
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

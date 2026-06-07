@@ -1,0 +1,83 @@
+---
+import "../styles/site.css";
+import { absoluteUrl, withBase } from "../lib/site";
+import { footer } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Route of this page, e.g. "/", "/services" — used for canonical / og:url. */
+  path: string;
+}
+
+const { title, description, path } = Astro.props;
+const canonical = absoluteUrl(path, Astro.site);
+const ogImage = absoluteUrl("/assets/og_image.webp", Astro.site);
+
+// Base-aware hexagon background for .hero-hex / .page-head (so it resolves
+// correctly even if the site is served from a sub-path).
+const hexBg = `url('${withBase("/assets/bg.webp")}')`;
+
+// Organization structured data (SEO). sameAs from the footer social links.
+const orgLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "七維思股份有限公司 Kiwissec",
+  url: Astro.site ? Astro.site.href : canonical,
+  logo: absoluteUrl("/assets/logos/lockup-h-primary-green.png", Astro.site),
+  email: footer.email,
+  telephone: "+886-2-2312-0400",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "TW",
+    addressLocality: "臺北市",
+    streetAddress: "中山區復興北路48號7樓",
+  },
+  sameAs: footer.socials.map(([, href]) => href),
+};
+---
+
+<!doctype html>
+<html lang="zh-TW" style={`--hex-bg: ${hexBg}`}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={withBase("/assets/logo.ico")} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="七維思 Kiwis" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fonts (v1: CDN; self-hosting tracked as follow-up) + Font Awesome -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn/dist/MapleMono-CN-Regular/result.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(orgLd)}
+    />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

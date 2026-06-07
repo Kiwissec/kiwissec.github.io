@@ -1,0 +1,34 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { testimonials } from "../data/site";
+---
+
+<section class="section section-tint" id="voices">
+  <div class="voice-bg" aria-hidden="true">
+    <span class="vblob vblob-1"></span>
+    <span class="vblob vblob-2"></span>
+    <span class="vblob vblob-3"></span>
+  </div>
+  <div class="wrap">
+    <SectionHead zh="課程見證" en="What Learners Say" />
+    <p class="voice-intro">
+      學員上完課後的真實回饋 ——<br />這是我們持續把資安「講得簡單」的動力。
+    </p>
+    <div class="voice-grid">
+      {
+        testimonials.map((t) => (
+          <figure class="voice-card">
+            <span class="voice-quote" aria-hidden="true">&ldquo;</span>
+            <blockquote>{t.q}</blockquote>
+            <figcaption class="voice-by">
+              <span class="voice-avatar">
+                <i class={t.icon} />
+              </span>
+              <span class="voice-role">{t.who}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

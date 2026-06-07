@@ -1,0 +1,33 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { contact } from "../data/site";
+---
+
+<section class="section" id="contact">
+  <div class="wrap">
+    <SectionHead zh="聯絡我們" en="Contact Us" />
+    <div class="contact">
+      <p class="contact-lead">{contact.lead}</p>
+      <div class="contact-grid">
+        {
+          contact.methods.map((m) => (
+            <a
+              class="contact-card"
+              href={m.href}
+              target={m.href.startsWith("http") ? "_blank" : undefined}
+              rel={m.href.startsWith("http") ? "noopener" : undefined}
+            >
+              <span class="contact-ico">
+                <i class={m.icon} />
+              </span>
+              <span class="contact-text">
+                <span class="contact-label">{m.label}</span>
+                <span class="contact-value">{m.value}</span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

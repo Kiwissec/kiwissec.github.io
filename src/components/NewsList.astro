@@ -1,0 +1,75 @@
+---
+import NewsCard from "./NewsCard.astro";
+import { news } from "../data/site";
+import { withBase } from "../lib/site";
+
+const tags = ["全部", ...Array.from(new Set(news.map((n) => n.tag)))];
+const count = (t: string) => news.filter((n) => n.tag === t).length;
+---
+
+<header class="page-head">
+  <div class="page-head-bg" aria-hidden="true">
+    <span class="blob blob-cream"></span>
+    <span class="blob blob-kiwi"></span>
+    <span class="hero-hex"></span>
+  </div>
+  <div class="wrap page-head-inner">
+    <nav class="crumbs">
+      <a href={withBase("/")}>首頁</a> <span>/</span> 最新消息
+    </nav>
+    <h1>最新消息</h1>
+    <p>七維思的活動快訊、課程與社群動態 —— 看看鳥鳥們最近都在忙些什麼。</p>
+  </div>
+</header>
+
+<section class="section section-flush" id="all-news">
+  <div class="wrap">
+    <div class="course-tabs" role="tablist" aria-label="消息分類">
+      {
+        tags.map((t, i) => (
+          <button
+            class={"course-tab" + (i === 0 ? " is-active" : "")}
+            role="tab"
+            data-tag={t}
+            aria-selected={i === 0 ? "true" : "false"}
+          >
+            {t}
+            {t !== "全部" && <span class="tab-count">{count(t)}</span>}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="news-grid">
+      {news.map((n) => <NewsCard item={n} />)}
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById("all-news");
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>(".course-tab"));
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".news"));
+    let active = "全部";
+
+    const render = () => {
+      cards.forEach((card) => {
+        card.hidden = !(active === "全部" || card.dataset.tag === active);
+      });
+      tabs.forEach((t) => {
+        const on = t.dataset.tag === active;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", String(on));
+      });
+    };
+
+    tabs.forEach((t) =>
+      t.addEventListener("click", () => {
+        active = t.dataset.tag || "全部";
+        render();
+      }),
+    );
+    render();
+  }
+</script>

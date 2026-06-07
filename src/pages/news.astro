@@ -1,0 +1,16 @@
+---
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import NewsList from "../components/NewsList.astro";
+import Footer from "../components/Footer.astro";
+
+const title = "最新消息 — 七維思 Kiwis";
+const description =
+  "七維思的活動快訊、課程與社群動態 —— CYBERSEC、七維思神社、校園講座與新聞發佈，看看鳥鳥們最近都在忙些什麼。";
+---
+
+<Base title={title} description={description} path="/news">
+  <Navbar />
+  <NewsList />
+  <Footer />
+</Base>

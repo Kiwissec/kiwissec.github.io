@@ -1,0 +1,131 @@
+---
+import { nav } from "../data/site";
+import { withBase } from "../lib/site";
+
+// Mark the active top-level link. Normalise trailing slash so "/services/"
+// and "/services" both match.
+const current = Astro.url.pathname.replace(/\/$/, "") || "/";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const isCurrent = (href: string) => {
+  // In-page anchors (e.g. "/#about") are not a distinct "current page" — skip
+  // them so the home page doesn't mark several links as aria-current at once.
+  if (!href.startsWith("/") || href.includes("#")) return false;
+  const target = (base + href).replace(/\/$/, "") || "/";
+  return target === current;
+};
+---
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href={withBase("/")} aria-label="七維思資安 首頁">
+      <img
+        class="nav-mark"
+        src={withBase("/assets/logos/mark-primary-green.png")}
+        alt="七維思 Kiwis"
+        width="46"
+        height="46"
+      />
+      <span class="nav-word">
+        <span class="nav-word-zh">七維思資安</span>
+        <span class="nav-word-en">KIWISSEC</span>
+      </span>
+    </a>
+
+    <ul class="nav-links">
+      {
+        nav.map((n) =>
+          n.children ? (
+            <li class="nav-group">
+              <button class="nav-grouptop" aria-haspopup="true" aria-expanded="false">
+                {n.label} <i class="fa-solid fa-chevron-down nav-caret" />
+              </button>
+              <ul class="nav-dropdown">
+                {n.children.map((c) => (
+                  <li>
+                    <a
+                      href={withBase(c.href)}
+                      target={c.external ? "_blank" : undefined}
+                      rel={c.external ? "noopener" : undefined}
+                    >
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ) : (
+            <li class={n.cta ? "nav-cta" : ""}>
+              <a
+                href={withBase(n.href!)}
+                class={isCurrent(n.href!) ? "is-current" : undefined}
+                aria-current={isCurrent(n.href!) ? "page" : undefined}
+                target={n.external ? "_blank" : undefined}
+                rel={n.external ? "noopener" : undefined}
+              >
+                {n.cta && <i class="fa-solid fa-paper-plane" />}
+                {n.label}
+              </a>
+            </li>
+          ),
+        )
+      }
+    </ul>
+
+    <button class="nav-toggle" aria-label="開啟選單" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<script>
+  const nav = document.querySelector<HTMLElement>(".nav");
+  const toggle = nav?.querySelector<HTMLButtonElement>(".nav-toggle");
+  const toggleIcon = toggle?.querySelector("i");
+
+  const setMenu = (open: boolean) => {
+    nav?.classList.toggle("open", open);
+    toggle?.setAttribute("aria-expanded", String(open));
+    if (toggleIcon)
+      toggleIcon.className = open ? "fa-solid fa-xmark" : "fa-solid fa-bars";
+    if (!open)
+      nav
+        ?.querySelectorAll(".nav-group.is-open")
+        .forEach((g) => g.classList.remove("is-open"));
+  };
+
+  toggle?.addEventListener("click", () =>
+    setMenu(!nav?.classList.contains("open")),
+  );
+
+  // Dropdown groups. Click toggles (mobile + pointer). On desktop the CSS also
+  // opens on hover / focus-within, so mirror that in aria-expanded for keyboard
+  // users; on mobile the offcanvas shows children only when .is-open, so the
+  // click toggle keeps aria-expanded in sync with what's visible.
+  const isDesktop = () => window.matchMedia("(min-width: 769px)").matches;
+  nav?.querySelectorAll<HTMLElement>(".nav-group").forEach((group) => {
+    const top = group.querySelector<HTMLButtonElement>(".nav-grouptop");
+    const setOpen = (open: boolean) => {
+      group.classList.toggle("is-open", open);
+      top?.setAttribute("aria-expanded", String(open));
+    };
+    top?.addEventListener("click", () =>
+      setOpen(!group.classList.contains("is-open")),
+    );
+    group.addEventListener("focusin", () => {
+      if (isDesktop()) top?.setAttribute("aria-expanded", "true");
+    });
+    group.addEventListener("focusout", (e) => {
+      if (!group.contains(e.relatedTarget as Node | null)) setOpen(false);
+    });
+  });
+
+  // Close the mobile menu after following any link.
+  nav?.querySelectorAll(".nav-links a").forEach((a) =>
+    a.addEventListener("click", () => setMenu(false)),
+  );
+
+  // Close on Escape.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setMenu(false);
+  });
+</script>

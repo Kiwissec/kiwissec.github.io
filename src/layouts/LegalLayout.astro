@@ -1,0 +1,43 @@
+---
+import Base from "./Base.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { withBase } from "../lib/site";
+
+interface Props {
+  zh: string;
+  en: string;
+  title: string;
+  description: string;
+  path: string;
+}
+const { zh, en, title, description, path } = Astro.props;
+---
+
+<Base title={title} description={description} path={path}>
+  <Navbar />
+  <header class="page-head">
+    <div class="page-head-bg" aria-hidden="true">
+      <span class="blob blob-cream"></span>
+      <span class="blob blob-kiwi"></span>
+      <span class="hero-hex"></span>
+    </div>
+    <div class="wrap page-head-inner">
+      <nav class="crumbs"><a href={withBase("/")}>首頁</a> <span>/</span> {zh}</nav>
+      <h1>{zh}</h1>
+      <p style="color:var(--gray-600);font-size:1.05rem;letter-spacing:.08em">
+        {en}
+      </p>
+    </div>
+  </header>
+
+  <section class="section section-flush">
+    <div class="wrap">
+      <div class="legal">
+        <slot />
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

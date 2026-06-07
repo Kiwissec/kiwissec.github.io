@@ -1,0 +1,75 @@
+---
+import { footer, company } from "../data/site";
+import { withBase } from "../lib/site";
+const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img
+          class="footer-logo"
+          src={withBase("/assets/logos/lockup-h-primary-green.png")}
+          alt="七維思 Kiwis"
+          width="162"
+          height="162"
+        />
+        <p class="footer-slogan">
+          {
+            footer.slogan.map((line, i) => (
+              <>
+                {i > 0 && <br />}
+                {line}
+              </>
+            ))
+          }
+        </p>
+      </div>
+
+      <nav class="footer-col" aria-label="網站導覽">
+        <h4>網站導覽</h4>
+        {footer.about.map(([href, label]) => <a href={withBase(href)}>{label}</a>)}
+      </nav>
+
+      <nav class="footer-col" aria-label="政策與條款">
+        <h4>政策與條款</h4>
+        {footer.help.map(([href, label]) => <a href={withBase(href)}>{label}</a>)}
+      </nav>
+
+      <div class="footer-col footer-contact">
+        <h4>聯絡資訊</h4>
+        <a href={"mailto:" + footer.email}>
+          <i class="fa-solid fa-envelope"></i><span>{footer.email}</span>
+        </a>
+        <a href={telHref}>
+          <i class="fa-solid fa-phone"></i><span>{footer.phone}</span>
+        </a>
+        <div class="footer-addr">
+          <i class="fa-solid fa-location-dot"></i><span>{footer.addr}</span>
+        </div>
+        <span class="footer-follow">追蹤我們</span>
+        <div class="socials">
+          {
+            footer.socials.map(([icon, href]) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener"
+                aria-label={icon.replace("fa-", "")}
+              >
+                <i class={"fa-brands " + icon} />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <hr class="footer-hr" />
+    <div class="footer-bottom">
+      <span>{company.copyright}</span>
+      <span>{footer.tax}</span>
+    </div>
+  </div>
+</footer>

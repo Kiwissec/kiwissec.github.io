@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Test artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# OS / editor
+.DS_Store
+*.log
+
+# Defensive: never publish internal / scratch material
+tmp/
+.mcp.json
+CLAUDE.md
+.claude/
+old-website/

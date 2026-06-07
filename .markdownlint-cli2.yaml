@@ -1,0 +1,21 @@
+config:
+  # Markdown 含長 Claude prompt、表格與指令範例，硬換行會降低可讀性
+  MD013: false
+
+  # CLAUDE.md 開頭為模板 metadata 註解，先於第一個標題
+  MD041: false
+
+  # 不同父標題下的重複章節名稱可接受（changelog 風格）
+  MD024:
+    siblings_only: true
+
+globs:
+  - "**/*.md"
+  - ".claude/**/*.md"
+
+ignores:
+  - ".git"
+  - "old-website/**"
+  - "node_modules/**"
+  - "dist/**"
+  - ".astro/**"

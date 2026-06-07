@@ -1,0 +1,30 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { resources, resourceIntro } from "../data/site";
+---
+
+<section class="section" id="resources">
+  <div class="wrap">
+    <SectionHead zh="延伸學習資源" en="Learning Resources" />
+    <p class="courses-intro">{resourceIntro}</p>
+    <div class="res-grid">
+      {
+        resources.map((r) => (
+          <a class="res-card" href={r.href} target="_blank" rel="noopener">
+            <span class="res-ico">
+              <i class={r.icon} />
+            </span>
+            <span class="res-body">
+              <span class="res-tag">{r.tag}</span>
+              <span class="res-name">
+                {r.name}
+                <i class="fa-solid fa-arrow-up-right-from-square res-ext" />
+              </span>
+              <span class="res-desc">{r.desc}</span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>

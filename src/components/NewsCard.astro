@@ -1,0 +1,25 @@
+---
+import type { NewsItem } from "../data/site";
+import { withBase } from "../lib/site";
+interface Props {
+  item: NewsItem;
+}
+const { item } = Astro.props;
+---
+
+<article class="news" data-tag={item.tag}>
+  <img
+    class="news-thumb"
+    src={withBase("/assets/news/" + item.img)}
+    alt=""
+    loading="lazy"
+  />
+  <div>
+    <div class="news-meta">
+      <span class="badge">{item.tag}</span>
+      <span class="news-date">{item.date}</span>
+    </div>
+    <h3>{item.title}</h3>
+    <p>{item.desc}</p>
+  </div>
+</article>

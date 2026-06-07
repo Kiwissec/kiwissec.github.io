@@ -1,0 +1,56 @@
+---
+import { hero } from "../data/site";
+import { withBase } from "../lib/site";
+---
+
+<section class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true">
+    <span class="blob blob-cream"></span>
+    <span class="blob blob-kiwi"></span>
+    <span class="hero-hex"></span>
+    <img class="hero-deco deco-saturn" src={withBase("/assets/saturn.webp")} alt="" />
+    <img class="hero-deco deco-rocket" src={withBase("/assets/rocket.webp")} alt="" />
+  </div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"
+        ><i class="fa-solid fa-shield-halved"></i> 把複雜的資安，講得簡單</span
+      >
+      <h1>
+        <span class="hero-brand">{hero.brand}</span><span class="hl"
+          >{hero.title1}</span
+        ><br />{hero.title2}
+      </h1>
+      <p>{hero.desc}</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={withBase("/courses")}>
+          了解企業課程 <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="btn btn-ghost" href="#contact">聯絡我們</a>
+      </div>
+      <div class="pillars">
+        {
+          hero.trust.map((s) => (
+            <div class="trust-item">
+              <span class="trust-n">{s.n}</span>
+              <span class="trust-l">{s.l}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="hero-visual">
+      <span class="hero-disk"></span>
+      <img
+        class="hero-mark"
+        src={withBase("/assets/logos/mark-bird-hat-green.png")}
+        alt="七維思資安領航員吉祥物"
+        width="260"
+        height="260"
+      />
+    </div>
+  </div>
+  <a class="hero-scroll" href="#about" aria-label="向下捲動">
+    <i class="fa-solid fa-chevron-down"></i>
+  </a>
+</section>

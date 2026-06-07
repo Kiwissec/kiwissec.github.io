@@ -1,0 +1,30 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { services } from "../data/site";
+import { withBase } from "../lib/site";
+---
+
+<section class="section" id="services">
+  <div class="wrap">
+    <SectionHead zh="服務項目" en="Our Services" />
+    <div class="prod-grid prod-grid-4">
+      {
+        services.map((s) => (
+          <a class="prod prod-link" href={withBase("/services#" + s.id)}>
+            <div class="prod-disk">
+              <i class={s.icon} />
+            </div>
+            <h3>{s.name}</h3>
+            <p>{s.short}</p>
+            <span class="prod-go">
+              了解更多 <i class="fa-solid fa-arrow-right" />
+            </span>
+          </a>
+        ))
+      }
+    </div>
+    <div class="center">
+      <a class="btn btn-ghost" href={withBase("/services")}>查看所有服務內容</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,33 @@
+---
+import SectionHead from "./SectionHead.astro";
+import { about } from "../data/site";
+import { withBase } from "../lib/site";
+---
+
+<section class="section" id="about">
+  <div class="wrap">
+    <SectionHead zh="關於我們" en="About Us" />
+    <div class="about-grid">
+      <img
+        class="about-img"
+        src={withBase("/assets/platform.webp")}
+        alt="七維思學習平台情境插畫"
+      />
+      <div class="about-body">
+        <p>{about.p1}</p>
+        <p>{about.p2}</p>
+        <div style="margin-top:4px">我們的專業實力：</div>
+        <ul class="about-list">
+          {
+            about.points.map((p) => (
+              <li>
+                <i class="fa-solid fa-circle-check" />
+                <span>{p}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,268 @@
+/* Full Traditional-Chinese Maple Mono (progressive enhancement; fails
+   silently → Open Huninn covers CJK) is loaded via <link> in the Base
+   layout head — a remote @import here trips the build's CSS bundler. */
+
+/* ============================================================
+   Kiwissec 七維思 Kiwis — Design Tokens
+   tokens.css  (source: design bundle colors_and_type.css — verbatim)
+   Source of truth: Kiwissec/Official-website  (old-website backup)
+   Brand: warm, friendly cybersecurity *education* — coffee browns,
+   taupe, cream, with a kiwi-green accent lifted from the logo.
+   ------------------------------------------------------------
+   FONTS
+   Primary brand face: **Maple Mono** (subframe7536/maple-font) — a
+   rounded MONOSPACE with full Traditional-Chinese (Maple Mono CN,
+   Resource-Han-Rounded base). Rounded corners echo the logo; the
+   monospace/terminal character fits a *security* brand. Ligatures +
+   tabular numerals give code & data a crisp, techy feel.
+
+   Loading strategy (resilient, progressive):
+     1. Maple Mono LATIN  — Fontsource woff2 (reliable). Carries Latin,
+        numerals, symbols, code — where Maple's character shows most.
+     2. Maple Mono CN     — full Traditional-Chinese webfont, loaded via
+        @import above. Upgrades CJK to Maple.
+     3. Open Huninn       — guaranteed, on-brand ROUNDED CJK fallback so
+        Chinese always renders warmly even if (2) is unavailable.
+   v1 loads these via CDN; self-hosting is tracked as a follow-up
+   (see fonts/README.md in the design bundle).
+   ============================================================ */
+
+/* 1. Maple Mono — Latin (reliable) */
+@font-face {
+  font-family: "Maple Mono";
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-400-normal.woff2)
+    format("woff2");
+  font-display: swap;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Maple Mono";
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-500-normal.woff2)
+    format("woff2");
+  font-display: swap;
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Maple Mono";
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-700-normal.woff2)
+    format("woff2");
+  font-display: swap;
+  font-weight: 700;
+}
+
+/* 3. Open Huninn — rounded CJK fallback / long-form reading alt */
+@font-face {
+  font-family: "Open Huninn";
+  src: url(https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-1.1.ttf)
+    format("truetype");
+  font-display: swap;
+  font-weight: 400 700;
+}
+
+:root {
+  /* ---------- BRAND CORE (from old-website CSS, verified) ---------- */
+  --brown-900: #3f3128; /* darkest coffee — added for AA body text   */
+  --brown-700: #513f33; /* btn-primary :hover / pressed              */
+  --brown-600: #664f40; /* PRIMARY — titles, links, buttons          */
+  --taupe-500: #af9380; /* SECONDARY — accents, secondary buttons    */
+  --taupe-600: #8c7566; /* secondary :hover                          */
+  --taupe-700: #6f5b4e; /* AA-safe taupe for text on white (added)   */
+  --cream-200: #fff2de; /* warm cream — highlights, badge text       */
+  --cream-100: #fff8ee; /* lighter cream wash (added)                */
+
+  /* ---------- KIWI ACCENT (sampled from logo — NEW to system) ----- */
+  --kiwi-500: #c8dd6b; /* kiwi rind / seed ring — fresh accent      */
+  --kiwi-600: #a9c24a; /* AA-safer kiwi for fills w/ brown text     */
+  --kiwi-100: #f0f3c0; /* kiwi flesh — pale wash                    */
+
+  /* ---------- ILLUSTRATION ACCENTS (sampled, use sparingly) ------- */
+  --peach-300: #ffd7aa; /* hexagon / illustration peach              */
+  --sun-400: #fddc49; /* highlight yellow                          */
+  --plum-700: #50124d; /* astronaut visor — deep contrast accent    */
+
+  /* ---------- NEUTRALS ---------- */
+  --ink-900: #2e2a27; /* near-black warm ink (added, AA body)      */
+  --gray-600: #595959; /* AA-safe secondary text (added)            */
+  --gray-500: #777777; /* footer text (original)                    */
+  --gray-400: #848484; /* English subtitles (original, large only)  */
+  --line-300: #e4dbd5; /* warm hairline / toast header / circles    */
+  --surface-100: #f1f1f1; /* page surface / section bg (original)      */
+  --surface-0: #ffffff; /* cards / inputs                            */
+  --select-bg: #404040; /* ::selection background                    */
+
+  /* ---------- SEMANTIC ROLES ---------- */
+  --color-bg: var(--surface-100);
+  --color-surface: var(--surface-0);
+  --color-text: var(--ink-900);
+  --color-text-muted: var(--gray-600);
+  --color-heading: var(--brown-600);
+  --color-subhead-en: var(--gray-400);
+  --color-primary: var(--brown-600);
+  --color-primary-hover: var(--brown-700);
+  --color-accent: var(--taupe-500);
+  --color-accent-hover: var(--taupe-600);
+  --color-link: var(--brown-600);
+  --color-link-soft: var(--taupe-700);
+  --color-fresh: var(--kiwi-500);
+  --color-hairline: var(--line-300);
+  --color-focus-ring: rgba(175, 147, 128, 0.45);
+
+  --color-success: #3f8f3f; /* fa-circle-check green, AA-tuned  */
+
+  /* ---------- TYPE ----------
+       Primary face is Maple Mono. 'Maple Mono' (Latin) is declared via
+       @font-face below, so it's the project-recognized primary; the CN
+       names that follow are served by the remote @import and kick in
+       per-glyph for CJK, with Open Huninn as the guaranteed CJK floor. */
+  --font-sans:
+    "Maple Mono", "Maple Mono NF CN", "Maple Mono CN", "MapleMono-CN-Regular",
+    "Open Huninn", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+    system-ui, sans-serif;
+  --font-mono:
+    "Maple Mono", "Maple Mono NF CN", "Maple Mono CN", "Open Huninn",
+    ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Long-form reading alt: proportional rounded CJK (less character
+       spacing than monospace). Use for dense paragraphs if desired. */
+  --font-reading:
+    "Open Huninn", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+    system-ui, sans-serif;
+
+  /* Type scale — based on the live site's Bootstrap fs-* usage,
+       regularised into a modular ramp. Min body 16px (a11y).        */
+  /* Fluid sizing lives in the consuming rule (clamp commas confuse
+       token parsers); these are the max/target rems. */
+  --text-hero: 3.5rem; /* banner H1 — fluid via clamp in rule */
+  --text-h1: 2.5rem; /* section zh — fluid via clamp in rule */
+  --text-h2: 1.625rem; /* 26px — sub-section / FAQ question      */
+  --text-h3: 1.25rem; /* 20px — product card title             */
+  --text-en-sub: 1.125rem; /* 18px — English subtitle under H1      */
+  --text-body: 1rem; /* 16px — base                           */
+  --text-body-lg: 1.0625rem; /* 17px — comfy reading                  */
+  --text-small: 0.85rem; /* dates / meta                          */
+  --text-xs: 0.75rem; /* legal / footer fine print             */
+
+  --leading-tight: 1.25;
+  --leading-snug: 1.5;
+  --leading-prose: 1.8; /* the site's signature relaxed CJK leading  */
+
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --tracking-wide: 0.1em; /* slogan / EN caps                         */
+
+  /* ---------- SPACING (8pt base, with the site's signature gaps) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 90px; /* mobile section padding-top (original)        */
+  --space-10: 120px; /* desktop section-distance (original)         */
+
+  /* ---------- RADII ---------- */
+  --radius-xs: 5px; /* nav-link, faq hr, small chips                */
+  --radius-sm: 8px; /* buttons, inputs (Bootstrap default .375rem→) */
+  --radius-md: 10px; /* news images, cards                           */
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* ---------- ELEVATION ---------- */
+  /* The brand uses GLOW (drop-shadow), not hard drop shadows.        */
+  --glow-primary: drop-shadow(0 0 1rem var(--taupe-500));
+  --glow-accent: drop-shadow(0 0 1rem var(--cream-200));
+  --shadow-card: 0 6px 24px -12px rgba(102, 79, 64, 0.28);
+  --shadow-card-hover: 0 14px 36px -14px rgba(102, 79, 64, 0.38);
+  --shadow-soft: 0 2px 10px -4px rgba(102, 79, 64, 0.18);
+  --shadow-lift: 0 24px 60px -24px rgba(102, 79, 64, 0.45);
+
+  /* ---------- WARM GRADIENTS (on-brand, lively but earthy) --------
+       NEVER blue/purple. Built only from brand + illustration hues so
+       gradients read as "warm sunrise / fresh kiwi", not generic SaaS. */
+  --grad-warm: linear-gradient(150deg, #fff8ee 0%, #ffe9c7 100%);
+  --grad-dawn: linear-gradient(150deg, #fff2de 0%, #ffd7aa 60%, #fddc49 130%);
+  --grad-kiwi: linear-gradient(135deg, #d6e885 0%, #a9c24a 100%);
+  --grad-brand: linear-gradient(135deg, #8c7566 0%, #664f40 100%);
+  --grad-brand-deep: linear-gradient(140deg, #6f5b4e 0%, #4a382d 100%);
+  /* Soft page wash + radial glows for layered section backgrounds */
+  --grad-page: linear-gradient(180deg, #fffbf4 0%, #f4eee6 100%);
+  --glow-cream: radial-gradient(
+    closest-side,
+    rgba(255, 215, 170, 0.55),
+    rgba(255, 215, 170, 0)
+  );
+  --glow-kiwi: radial-gradient(
+    closest-side,
+    rgba(200, 221, 107, 0.5),
+    rgba(200, 221, 107, 0)
+  );
+  --glow-taupe: radial-gradient(
+    closest-side,
+    rgba(175, 147, 128, 0.4),
+    rgba(175, 147, 128, 0)
+  );
+
+  /* ---------- MOTION ---------- */
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 0.18s;
+  --dur-base: 0.3s;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT DEFAULTS — opt-in via .kiwi-type scope so this
+   file can be dropped into a page without nuking host styles.
+   ============================================================ */
+.kiwi-type {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-snug);
+  -webkit-font-smoothing: antialiased;
+}
+.kiwi-type h1,
+.kiwi-type .h1 {
+  font-size: clamp(1.875rem, 1.4rem + 1.9vw, var(--text-h1));
+  font-weight: var(--weight-bold);
+  color: var(--color-heading);
+  line-height: var(--leading-tight);
+}
+.kiwi-type h2,
+.kiwi-type .h2 {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+  color: var(--color-heading);
+  line-height: var(--leading-tight);
+}
+.kiwi-type h3,
+.kiwi-type .h3 {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent);
+}
+.kiwi-type p {
+  line-height: var(--leading-prose);
+  margin: 0 0 1em;
+}
+.kiwi-type a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+.kiwi-type a:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.kiwi-type .en-sub {
+  font-size: var(--text-en-sub);
+  color: var(--color-subhead-en);
+}
+.kiwi-type code,
+.kiwi-type .mono {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+
+::selection {
+  background: var(--select-bg);
+  color: #fff;
+}

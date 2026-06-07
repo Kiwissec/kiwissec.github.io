@@ -1,0 +1,171 @@
+---
+import { courseCats, courses, courseIntro } from "../data/site";
+import { withBase } from "../lib/site";
+
+const catLabel = (id: string) =>
+  courseCats.find((c) => c.id === id)?.label ?? "";
+const searchText = (c: (typeof courses)[number]) =>
+  (c.title + " " + c.desc + " " + c.tags.join(" ")).toLowerCase();
+---
+
+<header class="page-head">
+  <div class="page-head-bg" aria-hidden="true">
+    <span class="blob blob-cream"></span>
+    <span class="blob blob-kiwi"></span>
+    <span class="hero-hex"></span>
+  </div>
+  <div class="wrap page-head-inner">
+    <nav class="crumbs">
+      <a href={withBase("/")}>首頁</a> <span>/</span> 企業資安課程
+    </nav>
+    <h1>企業資安課程</h1>
+    <p>{courseIntro}</p>
+  </div>
+</header>
+
+<section class="section section-flush" id="all-courses">
+  <div class="wrap">
+    <div class="course-search">
+      <i class="fa-solid fa-magnifying-glass course-search-ico"></i>
+      <input
+        type="search"
+        class="course-search-input"
+        placeholder="搜尋課程名稱、主題或關鍵字…"
+        aria-label="搜尋課程"
+      />
+      <button class="course-search-clear" aria-label="清除搜尋" hidden>
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="course-tabs" role="tablist" aria-label="課程分類">
+      {
+        courseCats.map((c) => (
+          <button
+            class={"course-tab" + (c.id === "all" ? " is-active" : "")}
+            role="tab"
+            data-cat={c.id}
+            aria-selected={c.id === "all" ? "true" : "false"}
+          >
+            {c.label}
+            {c.id !== "all" && (
+              <span class="tab-count">
+                {courses.filter((x) => x.cat === c.id).length}
+              </span>
+            )}
+          </button>
+        ))
+      }
+    </div>
+
+    <p class="course-result">共 {courses.length} 門課程</p>
+
+    <div class="course-grid">
+      {
+        courses.map((c) => (
+          <article
+            class={"course-card cat-" + c.cat}
+            data-cat={c.cat}
+            data-search={searchText(c)}
+          >
+            <div class="course-card-top">
+              <span class="course-cat">{catLabel(c.cat)}</span>
+              <span class="course-hours">
+                <i class="fa-regular fa-clock" aria-hidden="true" />
+                {c.hours}
+              </span>
+            </div>
+            <h3 class="course-title">{c.title}</h3>
+            <p class="course-desc">{c.desc}</p>
+            <div class="course-tags">
+              {c.tags.map((t) => (
+                <span class="course-tag">#{t}</span>
+              ))}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="course-empty" hidden>
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>找不到符合的課程，換個關鍵字或分類再試試。</p>
+      <button class="btn btn-ghost" data-reset>清除條件</button>
+    </div>
+
+    <div class="courses-foot">
+      <p>所有課程皆可依企業需求客製安排。</p>
+      <div class="courses-foot-cta">
+        <a class="btn btn-primary" href={withBase("/#contact")}>
+          洽詢企業內訓 <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const VALID = ["all", "awareness", "offensive", "defensive"];
+  const root = document.getElementById("all-courses");
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>(".course-tab"));
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".course-card"));
+    const grid = root.querySelector<HTMLElement>(".course-grid")!;
+    const empty = root.querySelector<HTMLElement>(".course-empty")!;
+    const result = root.querySelector<HTMLElement>(".course-result")!;
+    const input = root.querySelector<HTMLInputElement>(".course-search-input")!;
+    const clear = root.querySelector<HTMLButtonElement>(".course-search-clear")!;
+
+    const fromUrl = new URLSearchParams(location.search).get("cat") || "all";
+    let active = VALID.includes(fromUrl) ? fromUrl : "all";
+    let raw = "";
+
+    const render = () => {
+      const q = raw.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((card) => {
+        const okCat = active === "all" || card.dataset.cat === active;
+        const okQ = !q || (card.dataset.search || "").includes(q);
+        const vis = okCat && okQ;
+        card.hidden = !vis;
+        if (vis) shown++;
+      });
+      tabs.forEach((t) => {
+        const on = t.dataset.cat === active;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", String(on));
+      });
+      grid.hidden = shown === 0;
+      empty.hidden = shown > 0;
+      result.hidden = shown === 0;
+      result.textContent =
+        `共 ${shown} 門課程` + (raw.trim() ? ` · 關鍵字「${raw.trim()}」` : "");
+      clear.hidden = !raw;
+    };
+
+    tabs.forEach((t) =>
+      t.addEventListener("click", () => {
+        active = t.dataset.cat || "all";
+        render();
+      }),
+    );
+    input.addEventListener("input", () => {
+      raw = input.value;
+      render();
+    });
+    clear.addEventListener("click", () => {
+      raw = "";
+      input.value = "";
+      input.focus();
+      render();
+    });
+    empty.querySelector("[data-reset]")?.addEventListener("click", () => {
+      active = "all";
+      raw = "";
+      input.value = "";
+      render();
+    });
+
+    render();
+  }
+</script>

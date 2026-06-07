@@ -1,0 +1,62 @@
+---
+import { services } from "../data/site";
+import { withBase } from "../lib/site";
+---
+
+<header class="page-head">
+  <div class="page-head-bg" aria-hidden="true">
+    <span class="blob blob-cream"></span>
+    <span class="blob blob-kiwi"></span>
+    <span class="hero-hex"></span>
+  </div>
+  <div class="wrap page-head-inner">
+    <nav class="crumbs"><a href={withBase("/")}>首頁</a> <span>/</span> 服務項目</nav>
+    <h1>服務項目</h1>
+    <p>
+      從企業教育訓練、顧問諮詢、檢測服務到個人課程，七維思提供完整的資安服務 ——
+      皆可依產業與需求客製。以下為各項服務的內容說明。
+    </p>
+  </div>
+</header>
+
+<section class="section section-flush">
+  <div class="wrap">
+    {
+      services.map((s) => (
+        <article class="svc-row" id={s.id}>
+          <div class="svc-aside">
+            <span class="svc-icon">
+              <i class={s.icon} />
+            </span>
+          </div>
+          <div class="svc-body">
+            <h2>{s.name}</h2>
+            <p class="svc-desc">{s.desc}</p>
+            <div class="svc-points-head">服務內容</div>
+            <ul class="svc-points">
+              {s.points.map((p) => (
+                <li>
+                  <i class="fa-solid fa-circle-check" />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+            <div class="svc-cta">
+              {s.cta.map((c) => (
+                <a
+                  class={"btn " + (c.primary ? "btn-primary" : "btn-ghost")}
+                  href={withBase(c.href)}
+                  target={c.external ? "_blank" : undefined}
+                  rel={c.external ? "noopener" : undefined}
+                >
+                  {c.label}
+                  {c.primary && <i class="fa-solid fa-arrow-right" />}
+                </a>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>

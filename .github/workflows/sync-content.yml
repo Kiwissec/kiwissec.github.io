@@ -1,0 +1,59 @@
+name: Sync content to main
+
+# Keep the long-lived `content` branch (where the CMS commits partner edits)
+# aligned with `main`, so editors always start from the latest code + content.
+# Runs after every push to `main` (PR merges, engineer syncs) and fast-forwards
+# `content` up to `main` — but ONLY when `content` has no un-merged commits of
+# its own. If a partner edit is still pending its content -> main PR, this leaves
+# `content` untouched so nothing is lost.
+#
+# The `content` branch is a public-repo concept; on a repo without one this is a
+# no-op (so it is harmless on the private repo). Uses GITHUB_TOKEN — updating a
+# branch ref is permitted (unlike *creating a PR*), and a token-driven ref update
+# does not re-trigger workflows, so there is no loop.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-content
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fast-forward content to main when safe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          repo="$GITHUB_REPOSITORY"
+          if ! gh api "repos/$repo/branches/content" >/dev/null 2>&1; then
+            echo "No 'content' branch in $repo — nothing to sync."
+            exit 0
+          fi
+          status="$(gh api "repos/$repo/compare/main...content" --jq '.status')"
+          echo "content vs main: $status"
+          case "$status" in
+            identical)
+              echo "content already equals main — nothing to do."
+              ;;
+            behind)
+              main_sha="$(gh api "repos/$repo/git/ref/heads/main" --jq '.object.sha')"
+              echo "fast-forwarding content to $main_sha"
+              gh api -X PATCH "repos/$repo/git/refs/heads/content" \
+                -f sha="$main_sha" -F force=false
+              echo "content fast-forwarded to main."
+              ;;
+            ahead | diverged)
+              echo "content has un-merged commits ($status) — leaving it for the content -> main PR. No action."
+              ;;
+            *)
+              echo "unexpected compare status: $status" >&2
+              exit 1
+              ;;
+          esac

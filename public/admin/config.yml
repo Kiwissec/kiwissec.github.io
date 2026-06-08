@@ -38,7 +38,7 @@ collections:
     slug: "{{fields.id}}"
     create: true
     delete: true
-    summary: "{{fields.order}} · {{fields.title}}"
+    summary: "{{order}} · {{title}}"
     fields:
       - {
           name: id,
@@ -72,7 +72,7 @@ collections:
     slug: "{{fields.id}}"
     create: true
     delete: true
-    summary: "{{fields.order}} · {{fields.name}}"
+    summary: "{{order}} · {{name}}"
     fields:
       - {
           name: id,
@@ -95,7 +95,7 @@ collections:
         label: 按鈕
         widget: list
         label_singular: 按鈕
-        summary: "{{fields.label}}"
+        summary: "{{label}}"
         fields:
           - { name: label, label: 按鈕文字, widget: string }
           - { name: href, label: 連結, widget: string, hint: "站內用 /courses，外部用完整網址" }
@@ -112,7 +112,7 @@ collections:
     slug: "{{fields.id}}"
     create: true
     delete: true
-    summary: "{{fields.date}} · {{fields.title}}"
+    summary: "{{date}} · {{title}}"
     fields:
       - {
           name: id,
@@ -148,7 +148,7 @@ collections:
     slug: "{{fields.id}}"
     create: true
     delete: true
-    summary: "{{fields.order}} · {{fields.who}}"
+    summary: "{{order}} · {{who}}"
     fields:
       - {
           name: id,

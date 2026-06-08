@@ -1,6 +1,6 @@
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
-import { file } from "astro/loaders";
+import { glob } from "astro/loaders";
 import { COURSE_CAT_IDS } from "./data/course-cats";
 
 // 常變動內容（課程 / 服務 / 消息 / 見證）以 src/data/*.json 維護，透過 Astro
@@ -15,7 +15,11 @@ import { COURSE_CAT_IDS } from "./data/course-cats";
 // 課程分類字彙的單一來源為 src/data/course-cats.ts。
 
 const courses = defineCollection({
-  loader: file("src/data/courses.json"),
+  loader: glob({
+    pattern: "**/*.json",
+    base: "./src/data/courses",
+    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
+  }),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),
@@ -28,7 +32,11 @@ const courses = defineCollection({
 });
 
 const services = defineCollection({
-  loader: file("src/data/services.json"),
+  loader: glob({
+    pattern: "**/*.json",
+    base: "./src/data/services",
+    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
+  }),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),
@@ -51,7 +59,11 @@ const services = defineCollection({
 });
 
 const news = defineCollection({
-  loader: file("src/data/news.json"),
+  loader: glob({
+    pattern: "**/*.json",
+    base: "./src/data/news",
+    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
+  }),
   schema: z.object({
     id: z.string(),
     tag: z.string(),
@@ -65,7 +77,11 @@ const news = defineCollection({
 });
 
 const testimonials = defineCollection({
-  loader: file("src/data/testimonials.json"),
+  loader: glob({
+    pattern: "**/*.json",
+    base: "./src/data/testimonials",
+    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
+  }),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),

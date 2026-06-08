@@ -1,0 +1,9 @@
+{
+  "id": "def-04",
+  "order": 25,
+  "cat": "defensive",
+  "title": "雲端架構與資安部署維運實務",
+  "tags": ["雲端安全", "Terraform", "IaC"],
+  "desc": "從公私有雲與三層式架構，到以 Terraform 實作 Azure 部署、權限管理、資安防護與成本控管。",
+  "hours": "3~4 小時"
+}

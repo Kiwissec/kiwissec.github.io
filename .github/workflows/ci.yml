@@ -2,8 +2,13 @@ name: CI
 
 # Runs on every pull request so reviewers can see type-check, build and
 # Playwright results from the GitHub status checks (deploy stays separate).
+# Also runs on pushes to `content` (the branch the CMS commits to) so partner
+# edits get the SAME full gate; that run attaches to the commit and surfaces as
+# the auto-opened content -> main PR's checks (see auto-pr.yml).
 on:
   pull_request:
+  push:
+    branches: [content]
   workflow_dispatch:
 
 permissions:

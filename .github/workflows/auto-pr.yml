@@ -1,0 +1,48 @@
+name: Open content PR
+
+# Sveltia CMS commits partner edits straight to the `content` branch (it has no
+# built-in editorial workflow yet). This Action opens — or reuses — a
+# `content` -> `main` pull request so every change is reviewed and merged like
+# any other PR, never landing on `main` unreviewed.
+#
+# The full verification (audit + type-check + build + e2e) runs via ci.yml,
+# which also triggers on pushes to `content`; its run is attached to the same
+# commit, so it shows up as the PR's status checks. (We deliberately do NOT
+# create the PR with a token that needs to re-trigger workflows — the push from
+# the CMS already does, since it carries a real user's identity.)
+on:
+  push:
+    branches: [content]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Open or reuse the content -> main PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only the genuine "no commits ahead" case is OK to skip silently;
+          # every other gh failure (auth / repo config / branch) must surface as
+          # a red workflow, not be masked into a green "nothing to open".
+          ahead="$(gh api "repos/$GITHUB_REPOSITORY/compare/main...content" --jq '.ahead_by')"
+          if [ "$ahead" -eq 0 ]; then
+            echo "content has no commits ahead of main — nothing to open."
+            exit 0
+          fi
+          open_count="$(gh pr list --repo "$GITHUB_REPOSITORY" \
+            --base main --head content --state open --json number --jq 'length')"
+          if [ "$open_count" -gt 0 ]; then
+            echo "A content -> main PR is already open; this push updated it."
+            exit 0
+          fi
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head content \
+            --title "content: 內容更新（CMS）" \
+            --body "由 Sveltia CMS 自動建立。合併前請確認下方 CI 全綠。"

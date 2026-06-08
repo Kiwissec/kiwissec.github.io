@@ -1,0 +1,167 @@
+# Sveltia CMS configuration for the Kiwissec site.
+#
+# Edits are committed to the PUBLIC repo (content is public-authoritative) on a
+# dedicated `content` branch — NEVER straight to `main`. A GitHub Action then
+# opens a `content` -> `main` PR so the full CI (Zod schema + content audit +
+# Playwright) gates every change before it deploys. (Sveltia has no built-in
+# editorial workflow yet, hence the branch + auto-PR pattern.)
+#
+# Each collection is stored one JSON file per entry under src/data/<collection>/
+# (see src/content.config.ts). The filename is the entry `id` (slug).
+
+backend:
+  name: github
+  repo: Kiwissec/kiwissec.github.io
+  branch: content
+  # OAuth token-exchange worker (authorization code flow). Fill in AFTER
+  # deploying sveltia-cms-auth — see docs/維護指南.md「前置設定（工程師）」.
+  base_url: https://REPLACE-WITH-OAUTH-WORKER.example.workers.dev
+
+# (Sveltia ignores Decap's `local_backend` and supports no proxy server; for
+# local testing it uses the File System Access API "Work with Local Repository"
+# in a Chromium browser — see docs/維護指南.md「本機驗證」.)
+
+# Global media library target for news images. Editors upload here; the news
+# `img` field keeps the BARE filename (the site prepends the path), so it stays
+# a plain string the content audit accepts.
+media_folder: public/assets/news
+public_folder: /assets/news
+
+collections:
+  - name: courses
+    label: 課程
+    label_singular: 課程
+    folder: src/data/courses
+    format: json
+    extension: json
+    identifier_field: id
+    slug: "{{fields.id}}"
+    create: true
+    delete: true
+    summary: "{{fields.order}} · {{fields.title}}"
+    fields:
+      - {
+          name: id,
+          label: 代號 (id),
+          widget: string,
+          hint: "唯一代號，英數與連字號，例如 aw-14；不可與其他課重複，會成為檔名",
+        }
+      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - name: cat
+        label: 分類
+        widget: select
+        # 對應 src/data/course-cats.ts 的 COURSE_CAT_IDS（單一來源）。新增分類時先改
+        # 該檔，這裡同步加一個 option；漂移會被 content.config.ts 的 Zod enum 在
+        # build 時大聲攔下（不會靜默上線）。
+        options:
+          - { label: 資安意識, value: awareness }
+          - { label: 攻防演練, value: offensive }
+          - { label: 資安防護, value: defensive }
+      - { name: title, label: 課程名稱, widget: string }
+      - { name: tags, label: 標籤, widget: list, hint: "至少一個；逐項輸入" }
+      - { name: desc, label: 課程簡介, widget: text }
+      - { name: hours, label: 時數, widget: string, hint: "文字即可，例如 1~3 小時" }
+
+  - name: services
+    label: 服務
+    label_singular: 服務
+    folder: src/data/services
+    format: json
+    extension: json
+    identifier_field: id
+    slug: "{{fields.id}}"
+    create: true
+    delete: true
+    summary: "{{fields.order}} · {{fields.name}}"
+    fields:
+      - {
+          name: id,
+          label: 代號 (id),
+          widget: string,
+          hint: "唯一代號，例如 education；不可重複，會成為檔名",
+        }
+      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - {
+          name: icon,
+          label: 圖示 (Font Awesome),
+          widget: string,
+          hint: "Font Awesome class，例如 fa-solid fa-graduation-cap；不確定請找工程師",
+        }
+      - { name: name, label: 服務名稱, widget: string }
+      - { name: short, label: 一句話短說明, widget: string }
+      - { name: desc, label: 完整說明, widget: text }
+      - { name: points, label: 重點清單, widget: list, hint: "至少一個；逐項輸入" }
+      - name: cta
+        label: 按鈕
+        widget: list
+        label_singular: 按鈕
+        summary: "{{fields.label}}"
+        fields:
+          - { name: label, label: 按鈕文字, widget: string }
+          - { name: href, label: 連結, widget: string, hint: "站內用 /courses，外部用完整網址" }
+          - { name: primary, label: 主要按鈕（深色）, widget: boolean, required: false, default: false }
+          - { name: external, label: 外部連結（另開分頁）, widget: boolean, required: false, default: false }
+
+  - name: news
+    label: 最新消息
+    label_singular: 消息
+    folder: src/data/news
+    format: json
+    extension: json
+    identifier_field: id
+    slug: "{{fields.id}}"
+    create: true
+    delete: true
+    summary: "{{fields.date}} · {{fields.title}}"
+    fields:
+      - {
+          name: id,
+          label: 代號 (id),
+          widget: string,
+          hint: "建議用該則日期，例如 2026-01-31；不可重複，會成為檔名",
+        }
+      - { name: tag, label: 標籤（會變成可篩選分類）, widget: string }
+      - name: date
+        label: 日期
+        widget: datetime
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+        hint: "網站依日期由新到舊排序"
+      - {
+          name: img,
+          label: 圖片檔名,
+          widget: string,
+          hint: "只填檔名（例如 260131.webp）。先用上方「媒體庫」上傳圖片到 assets/news，再把檔名填這裡",
+        }
+      - { name: title, label: 標題, widget: string }
+      - { name: desc, label: 內容說明, widget: text }
+
+  - name: testimonials
+    label: 學員見證
+    label_singular: 見證
+    folder: src/data/testimonials
+    format: json
+    extension: json
+    identifier_field: id
+    slug: "{{fields.id}}"
+    create: true
+    delete: true
+    summary: "{{fields.order}} · {{fields.who}}"
+    fields:
+      - {
+          name: id,
+          label: 代號 (id),
+          widget: string,
+          hint: "唯一代號，例如 t7；不可重複，會成為檔名",
+        }
+      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - { name: q, label: 見證內容, widget: text }
+      - { name: who, label: 身分, widget: string, hint: "例如 軟體工程師" }
+      - {
+          name: icon,
+          label: 圖示 (Font Awesome),
+          widget: string,
+          hint: "一般不用改；不確定請找工程師",
+        }

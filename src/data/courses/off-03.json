@@ -1,0 +1,9 @@
+{
+  "id": "off-03",
+  "order": 15,
+  "cat": "offensive",
+  "title": "系統化學習滲透測試課程（進階）",
+  "tags": ["滲透測試", "進階", "後滲透"],
+  "desc": "從 OSINT 偵察、WAF 繞過與 WebShell，到 CVE 分析與自動化提權，應對真實世界的複雜威脅。",
+  "hours": "6~18 小時"
+}

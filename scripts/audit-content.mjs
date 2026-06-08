@@ -32,10 +32,10 @@
 // 1 if any were found. Wired into CI before the build (fail-fast).
 
 import { readFileSync, statSync } from "node:fs";
+import { loadCollection } from "../src/data/_loadCollection.js";
 
 // Repo root, anchored to this script's location (scripts/), not the cwd.
 const root = new URL("../", import.meta.url);
-const readJson = (rel) => JSON.parse(readFileSync(new URL(rel, root), "utf8"));
 
 // A valid asset must be a regular FILE: statSync throws on a missing path and
 // .isFile() is false for a directory (which existsSync() would wrongly accept).
@@ -51,10 +51,10 @@ const errors = [];
 const fail = (msg) => errors.push(msg);
 
 const collections = {
-  courses: readJson("src/data/courses.json"),
-  services: readJson("src/data/services.json"),
-  news: readJson("src/data/news.json"),
-  testimonials: readJson("src/data/testimonials.json"),
+  courses: loadCollection("courses"),
+  services: loadCollection("services"),
+  news: loadCollection("news"),
+  testimonials: loadCollection("testimonials"),
 };
 
 // 1. `id` present + unique (every collection).

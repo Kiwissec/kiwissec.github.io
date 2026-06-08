@@ -1,0 +1,9 @@
+{
+  "id": "off-08",
+  "order": 20,
+  "cat": "offensive",
+  "title": "從 AI Security 到 Security of AI",
+  "tags": ["AI 資安", "LLM", "Prompt Injection"],
+  "desc": "剖析 LLM 的越獄、Prompt Injection、資料外洩與模型下毒等風險，規劃安全的 AI 導入。",
+  "hours": "2~3 小時"
+}

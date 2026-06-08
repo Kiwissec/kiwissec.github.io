@@ -4,12 +4,14 @@ import { test, expect } from "@playwright/test";
 // (content is hand-maintained in src/data/*.json by non-engineers). The tests
 // still assert the rendered count MATCHES the data and that filters behave —
 // only the magic numbers are gone.
-import courses from "../src/data/courses.json" with { type: "json" };
-import services from "../src/data/services.json" with { type: "json" };
-import news from "../src/data/news.json" with { type: "json" };
-import testimonials from "../src/data/testimonials.json" with { type: "json" };
+import { loadCollection } from "../src/data/_loadCollection.js";
 import { resources } from "../src/data/site";
 import { COURSE_CAT_IDS, COURSE_CAT_META } from "../src/data/course-cats";
+
+const courses = loadCollection("courses");
+const news = loadCollection("news");
+const services = loadCollection("services");
+const testimonials = loadCollection("testimonials");
 
 const coursesInCat = (cat: string) =>
   courses.filter((c) => c.cat === cat).length;

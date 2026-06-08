@@ -1,0 +1,9 @@
+{
+  "id": "def-03",
+  "order": 24,
+  "cat": "defensive",
+  "title": "開源軟體安全與 DevSecOps 自動化實務",
+  "tags": ["DevSecOps", "開源安全", "供應鏈"],
+  "desc": "涵蓋 SBOM 與軟體供應鏈安全、CI/CD pipeline 安全、Secret 管理與 Policy-as-Code 治理。",
+  "hours": "1.5~3 小時"
+}

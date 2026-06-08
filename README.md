@@ -36,7 +36,7 @@ tests/          Playwright smoke
 
 ## 內容維護
 
-課程／服務／最新消息／學員見證等內容存於 `src/data/*.json`，可由非工程夥伴直接在 GitHub 網頁編輯（請走 Pull Request，不要直接改 `main`）。完整步驟與欄位說明見 [`docs/維護指南.md`](./docs/維護指南.md)。
+課程／服務／最新消息／學員見證等內容以「每筆一檔」存於 `src/data/<collection>/*.json`，由非工程夥伴透過 **Sveltia CMS**（`/admin/`）編輯；改動會落 `content` 分支並自動開 PR，CI 綠後合併上線。完整步驟與欄位說明見 [`docs/維護指南.md`](./docs/維護指南.md)。
 
 ## 部署（GitHub Pages）
 

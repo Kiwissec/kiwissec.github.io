@@ -34,6 +34,10 @@ public/         靜態資源（assets / favicon / og 圖；robots 由 src/pages 
 tests/          Playwright smoke
 ```
 
+## 內容維護
+
+課程／服務／最新消息／學員見證等內容存於 `src/data/*.json`，可由非工程夥伴直接在 GitHub 網頁編輯（請走 Pull Request，不要直接改 `main`）。完整步驟與欄位說明見 [`docs/維護指南.md`](./docs/維護指南.md)。
+
 ## 部署（GitHub Pages）
 
 - 目標：`kiwissec.github.io`（org/user pages → 服務於站台根目錄，`astro.config.mjs` 的 `base` 為 `/`）。

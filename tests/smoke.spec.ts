@@ -1,4 +1,44 @@
 import { test, expect } from "@playwright/test";
+// Counts are derived from the same data sources the pages render from, so adding
+// or removing a course / service / news item / testimonial needs NO test edit
+// (content is hand-maintained in src/data/*.json by non-engineers). The tests
+// still assert the rendered count MATCHES the data and that filters behave —
+// only the magic numbers are gone.
+import courses from "../src/data/courses.json" with { type: "json" };
+import services from "../src/data/services.json" with { type: "json" };
+import news from "../src/data/news.json" with { type: "json" };
+import testimonials from "../src/data/testimonials.json" with { type: "json" };
+import { resources } from "../src/data/site";
+import { COURSE_CAT_IDS, COURSE_CAT_META } from "../src/data/course-cats";
+
+const coursesInCat = (cat: string) =>
+  courses.filter((c) => c.cat === cat).length;
+
+// Pick a category that currently has courses so the filter / deep-link tests stay
+// meaningful as content changes (the tab itself always renders from the taxonomy,
+// so this only guards against an empty category making the assertion trivial).
+const FILTER_CAT =
+  COURSE_CAT_IDS.find((id) => coursesInCat(id) > 0) ?? COURSE_CAT_IDS[0];
+
+// Derive a search term that exists in the data (first course's first tag; the
+// schema guarantees tags is non-empty) so the search test never silently degrades
+// when course copy is edited. Mirror CoursesCatalog's searchText (title + desc +
+// tags, lower-cased) so the expected hit count tracks the data.
+const SEARCH_TERM = courses[0].tags[0];
+const searchHits = courses.filter((c) =>
+  (c.title + " " + c.desc + " " + c.tags.join(" "))
+    .toLowerCase()
+    .includes(SEARCH_TERM.toLowerCase()),
+).length;
+
+// Derive an existing news tag (prefer one that doesn't cover every item, so the
+// filter visibly narrows) — its tab is then guaranteed to render even after
+// partners rename or remove tags, which is editable per the maintenance guide.
+const newsTags = [...new Set(news.map((n) => n.tag))];
+const NEWS_TAG =
+  newsTags.find((t) => news.filter((n) => n.tag === t).length < news.length) ??
+  newsTags[0];
+const newsInTag = news.filter((n) => n.tag === NEWS_TAG).length;
 
 const routes = [
   "/",
@@ -34,10 +74,10 @@ test("home matches the design composition", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".hero-brand")).toHaveText("七維思資安");
   await expect(page.locator(".hero h1 .hl")).toHaveText("學習資安不拐彎");
-  await expect(page.locator(".prod.prod-link")).toHaveCount(4); // services teaser
-  await expect(page.locator(".cat-card")).toHaveCount(3); // course categories
-  await expect(page.locator(".voice-card")).toHaveCount(6); // testimonials
-  await expect(page.locator(".res-card")).toHaveCount(3); // learning resources
+  await expect(page.locator(".prod.prod-link")).toHaveCount(services.length); // services teaser
+  await expect(page.locator(".cat-card")).toHaveCount(COURSE_CAT_IDS.length); // course categories
+  await expect(page.locator(".voice-card")).toHaveCount(testimonials.length); // testimonials
+  await expect(page.locator(".res-card")).toHaveCount(resources.length); // learning resources
   await expect(page.locator("#news")).toHaveCount(0); // news removed from landing
 });
 
@@ -45,25 +85,31 @@ test("courses: category filter, search and ?cat= deep-link", async ({
   page,
 }) => {
   await page.goto("/courses/");
-  await expect(page.locator(".course-card")).toHaveCount(26);
+  await expect(page.locator(".course-card")).toHaveCount(courses.length);
 
-  await page.click('.course-tab[data-cat="offensive"]');
-  await expect(page.locator(".course-card:visible")).toHaveCount(9);
+  await page.click(`.course-tab[data-cat="${FILTER_CAT}"]`);
+  await expect(page.locator(".course-card:visible")).toHaveCount(
+    coursesInCat(FILTER_CAT),
+  );
 
   await page.click('.course-tab[data-cat="all"]');
-  await page.fill(".course-search-input", "滲透");
-  await expect(page.locator(".course-card:visible")).toHaveCount(6);
+  await page.fill(".course-search-input", SEARCH_TERM);
+  await expect(page.locator(".course-card:visible")).toHaveCount(searchHits);
 
-  await page.goto("/courses/?cat=defensive");
-  await expect(page.locator(".course-card:visible")).toHaveCount(4);
-  await expect(page.locator(".course-tab.is-active")).toContainText("資安防護");
+  await page.goto(`/courses/?cat=${FILTER_CAT}`);
+  await expect(page.locator(".course-card:visible")).toHaveCount(
+    coursesInCat(FILTER_CAT),
+  );
+  await expect(page.locator(".course-tab.is-active")).toContainText(
+    COURSE_CAT_META[FILTER_CAT].label,
+  );
 });
 
 test("news tag filter narrows the list", async ({ page }) => {
   await page.goto("/news/");
-  await expect(page.locator(".news")).toHaveCount(6);
-  await page.click('.course-tab[data-tag="新聞發佈"]');
-  await expect(page.locator(".news:visible")).toHaveCount(2);
+  await expect(page.locator(".news")).toHaveCount(news.length);
+  await page.click(`.course-tab[data-tag="${NEWS_TAG}"]`);
+  await expect(page.locator(".news:visible")).toHaveCount(newsInTag);
 });
 
 test("faq accordion keeps a single panel open", async ({ page }) => {

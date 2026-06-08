@@ -28,7 +28,7 @@ src/
   components/   UI 元件（Navbar / Hero / Footer / 各區塊）
   layouts/      Base（含 SEO / OG）/ LegalLayout
   styles/       tokens.css（設計 token）+ site.css
-  data/         site.ts（內容資料，單一內容來源）
+  data/         *.json（內容 collections）+ site.ts（站台單例 / UI 文案）
   lib/          site.ts（base-path / 絕對網址工具）
 public/         靜態資源（assets / favicon / og 圖；robots 由 src/pages 動態產生）
 tests/          Playwright smoke

@@ -1,4 +1,6 @@
-// Kiwissec website — content data (single source of content)
+// Kiwissec website — stable site singletons & fixed UI copy (nav, hero, about,
+// faq, contact, footer, resources, company). Dynamic collections (courses,
+// services, news, testimonials) live in src/data/*.json; see content.config.ts.
 // Ported from the design bundle's ui_kits/website/data.js.
 // Sources: old-website (archived) + kiwissec.com (參考，2026-06 擷取整理；
 // 內容可能已改版，上線前以公司最新資訊為準). Internal hrefs use Astro

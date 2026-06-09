@@ -27,6 +27,7 @@ body {
 }
 img {
   max-width: 100%;
+  height: auto;
   display: block;
 }
 a {
@@ -1700,6 +1701,13 @@ a {
     margin-left: auto;
     margin-right: auto;
     justify-content: center;
+  }
+  /* Hero collapses to a single centred column here, so the copy spans the
+     full width. The absolutely-positioned floating decorations (z-index:2)
+     would then sit on top of the text and the mascot disk, so hide these
+     purely decorative (aria-hidden) elements from this breakpoint down. */
+  .hero-deco {
+    display: none;
   }
   .about-grid {
     grid-template-columns: 1fr;

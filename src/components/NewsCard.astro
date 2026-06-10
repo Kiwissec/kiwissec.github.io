@@ -19,7 +19,22 @@ const { item } = Astro.props;
       <span class="badge">{item.tag}</span>
       <span class="news-date">{item.date}</span>
     </div>
-    <h3>{item.title}</h3>
+    <h3>
+      {
+        item.url ? (
+          <a
+            class="news-link"
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {item.title}
+          </a>
+        ) : (
+          item.title
+        )
+      }
+    </h3>
     <p>{item.desc}</p>
   </div>
 </article>

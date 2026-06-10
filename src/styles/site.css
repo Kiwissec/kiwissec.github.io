@@ -604,6 +604,14 @@ a {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.news-link {
+  color: inherit;
+  text-decoration: none;
+}
+.news-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .news p {
   font-size: 0.9rem;
   line-height: 1.75;
@@ -1021,6 +1029,8 @@ a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  color: inherit;
+  text-decoration: none;
   transition:
     transform var(--dur-base),
     box-shadow var(--dur-base);
@@ -1104,6 +1114,19 @@ a {
   border-radius: 6px;
   padding: 3px 9px;
 }
+.course-more {
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--cat-badge, var(--brown-600));
+  transition: gap var(--dur-base);
+}
+.course-card:hover .course-more {
+  gap: 10px;
+}
 .courses-foot {
   text-align: center;
   margin-top: 44px;
@@ -1118,6 +1141,68 @@ a {
   flex-wrap: wrap;
   gap: 14px;
   justify-content: center;
+}
+
+/* ---------- Course detail (/courses/<id>) ---------- */
+.course-detail {
+  display: grid;
+  gap: 32px;
+  max-width: 760px;
+}
+.course-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.course-detail-lead {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  font-weight: 600;
+  color: var(--brown-700);
+  margin: 0 0 8px;
+}
+.course-detail-intro p {
+  line-height: 1.95;
+  color: var(--ink-900);
+  margin: 0 0 14px;
+}
+.course-detail-block {
+  margin-top: 30px;
+}
+.course-detail-block h2 {
+  font-size: 1.15rem;
+  color: var(--brown-700);
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 4px solid var(--cat-color, var(--taupe-500));
+}
+.course-outline,
+.course-objectives {
+  margin: 0;
+  padding-left: 1.4em;
+  line-height: 1.9;
+  color: var(--ink-900);
+}
+.course-outline li,
+.course-objectives li {
+  margin-bottom: 8px;
+}
+.course-detail-tags {
+  margin-top: 28px;
+}
+.course-detail-cta {
+  margin-top: 4px;
+  background: var(--cream-100);
+  border: 1px solid var(--line-300);
+  border-radius: 18px;
+  padding: 26px 24px;
+  text-align: center;
+}
+.course-detail-cta p {
+  color: var(--gray-600);
+  line-height: 1.8;
+  margin: 0 0 18px;
 }
 
 /* ---------- Courses teaser (landing) — category cards ---------- */

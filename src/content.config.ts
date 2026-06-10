@@ -28,6 +28,13 @@ const courses = defineCollection({
     tags: z.array(z.string()).nonempty(),
     desc: z.string(),
     hours: z.string(),
+    // 課程內頁（/courses/<id>）的延伸內容，對齊 kiwissec.com 既有課程頁結構：
+    // 介紹 / 課程大綱 / 適用人員 / 課程目標。皆 optional 作漸進增強——未填時內頁
+    // 仍以摘要＋洽詢 CTA 正常呈現，故先上 schema、後補內容不會破壞 build。
+    intro: z.string().optional(),
+    outline: z.array(z.string()).optional(),
+    audience: z.string().optional(),
+    objectives: z.array(z.string()).optional(),
   }),
 });
 
@@ -73,6 +80,9 @@ const news = defineCollection({
     img: z.string(),
     title: z.string(),
     desc: z.string(),
+    // 連往原始貼文（例如 Facebook）；optional 以漸進增強——留空時 NewsCard
+    // 維持純展示卡片，不破壞既有資料。
+    url: z.url().optional(),
   }),
 });
 

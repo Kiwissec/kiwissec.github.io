@@ -1,0 +1,125 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import { courseCats } from "../../data/site";
+import { withBase } from "../../lib/site";
+
+export async function getStaticPaths() {
+  const courses = await getCollection("courses");
+  return courses.map((course) => ({
+    params: { id: course.id },
+    props: { course },
+  }));
+}
+
+type Props = { course: CollectionEntry<"courses"> };
+const { course } = Astro.props;
+const c = course.data;
+
+const catLabel = courseCats.find((x) => x.id === c.cat)?.label ?? "";
+const title = `${c.title} — 企業資安課程 — 七維思 Kiwis`;
+
+// `intro` 為純文字欄位，以空行分段後逐段渲染（純文字，不用 set:html）。
+const introParas = (c.intro ?? "")
+  .split(/\n{2,}/)
+  .map((s) => s.trim())
+  .filter(Boolean);
+---
+
+<Base title={title} description={c.desc} path={`/courses/${course.id}`}>
+  <Navbar />
+
+  <header class="page-head">
+    <div class="page-head-bg" aria-hidden="true">
+      <span class="blob blob-cream"></span>
+      <span class="blob blob-kiwi"></span>
+      <span class="hero-hex"></span>
+    </div>
+    <div class="wrap page-head-inner">
+      <nav class="crumbs">
+        <a href={withBase("/")}>首頁</a> <span>/</span>
+        <a href={withBase("/courses")}>企業資安課程</a> <span>/</span>
+        {catLabel}
+      </nav>
+      <h1>{c.title}</h1>
+      <div class={"course-detail-meta cat-" + c.cat}>
+        <span class="course-cat">{catLabel}</span>
+        <span class="course-hours">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          {c.hours}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section section-flush">
+    <div class="wrap course-detail">
+      <article class={"course-detail-body cat-" + c.cat}>
+        <p class="course-detail-lead">{c.desc}</p>
+
+        {
+          introParas.length > 0 && (
+            <div class="course-detail-intro">
+              {introParas.map((p) => (
+                <p>{p}</p>
+              ))}
+            </div>
+          )
+        }
+
+        {
+          c.outline && c.outline.length > 0 && (
+            <section class="course-detail-block">
+              <h2>課程大綱</h2>
+              <ol class="course-outline">
+                {c.outline.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+
+        {
+          c.audience && (
+            <section class="course-detail-block">
+              <h2>適用人員</h2>
+              <p>{c.audience}</p>
+            </section>
+          )
+        }
+
+        {
+          c.objectives && c.objectives.length > 0 && (
+            <section class="course-detail-block">
+              <h2>課程目標</h2>
+              <ul class="course-objectives">
+                {c.objectives.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <div class="course-tags course-detail-tags">
+          {c.tags.map((t) => <span class="course-tag">#{t}</span>)}
+        </div>
+      </article>
+
+      <aside class="course-detail-cta">
+        <p>所有課程皆可依企業需求客製安排內訓。想了解完整課表與合作方式？</p>
+        <div class="courses-foot-cta">
+          <a class="btn btn-primary" href={withBase("/#contact")}>
+            洽詢企業內訓 <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <a class="btn btn-ghost" href={withBase("/courses")}>返回課程列表</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

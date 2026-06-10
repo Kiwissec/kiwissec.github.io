@@ -42,6 +42,17 @@ const NEWS_TAG =
   newsTags[0];
 const newsInTag = news.filter((n) => n.tag === NEWS_TAG).length;
 
+// News items may carry an optional external `url` (e.g. the source Facebook
+// post) which renders a new-tab link. Course detail content (intro / outline /
+// audience / objectives) is optional too — pick a course that has an outline so
+// the detail-page assertion stays meaningful as content is edited.
+const newsWithUrl = news.filter(
+  (n) => typeof n.url === "string" && n.url.length > 0,
+);
+const courseWithOutline = courses.find(
+  (c) => Array.isArray(c.outline) && c.outline.length > 0,
+);
+
 const routes = [
   "/",
   "/services/",
@@ -152,5 +163,44 @@ test("aria-current marks only the real current page", async ({ page }) => {
   await expect(page.locator('.nav-links [aria-current="page"]')).toHaveCount(1);
   await expect(page.locator('.nav-links a[aria-current="page"]')).toContainText(
     "最新消息",
+  );
+});
+
+test("news items with a url link to their source post in a new tab", async ({
+  page,
+}) => {
+  test.skip(newsWithUrl.length === 0, "no news item has a url");
+  await page.goto("/news/");
+  const links = page.locator(".news .news-link");
+  await expect(links).toHaveCount(newsWithUrl.length);
+  const first = links.first();
+  await expect(first).toHaveAttribute("target", "_blank");
+  await expect(first).toHaveAttribute("rel", /noopener/);
+  // The link points at one of the data-defined source urls (no fabricated href).
+  const href = await first.getAttribute("href");
+  expect(newsWithUrl.map((n) => n.url)).toContain(href);
+});
+
+test("course cards link to a detail page that renders the course", async ({
+  page,
+}) => {
+  const c = courses[0];
+  await page.goto("/courses/");
+  const card = page.locator(`.course-card[href$="/courses/${c.id}/"]`);
+  await expect(card).toHaveCount(1);
+  await card.click();
+  await expect(page).toHaveURL(new RegExp(`/courses/${c.id}/$`));
+  await expect(page.locator("h1")).toContainText(c.title);
+});
+
+test("course detail page renders the migrated outline when present", async ({
+  page,
+}) => {
+  test.skip(!courseWithOutline, "no course has outline content");
+  const c = courseWithOutline;
+  await page.goto(`/courses/${c.id}/`);
+  await expect(page.getByRole("heading", { name: "課程大綱" })).toBeVisible();
+  await expect(page.locator(".course-outline li")).toHaveCount(
+    c.outline.length,
   );
 });

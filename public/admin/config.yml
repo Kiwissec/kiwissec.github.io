@@ -61,6 +61,29 @@ collections:
       - { name: tags, label: 標籤, widget: list, hint: "至少一個；逐項輸入" }
       - { name: desc, label: 課程簡介, widget: text }
       - { name: hours, label: 時數, widget: string, hint: "文字即可，例如 1~3 小時" }
+      # 以下為課程內頁（點卡片後）的延伸內容，皆可留空；留空則內頁僅顯示摘要與洽詢按鈕。
+      - {
+          name: intro,
+          label: 課程介紹,
+          widget: text,
+          required: false,
+          hint: "內頁開頭的介紹段落；段落之間空一行即可分段",
+        }
+      - {
+          name: outline,
+          label: 課程大綱,
+          widget: list,
+          required: false,
+          hint: "逐項輸入，內頁以編號清單呈現",
+        }
+      - { name: audience, label: 適用人員, widget: text, required: false }
+      - {
+          name: objectives,
+          label: 課程目標,
+          widget: list,
+          required: false,
+          hint: "逐項輸入，內頁以清單呈現",
+        }
 
   - name: services
     label: 服務
@@ -137,6 +160,13 @@ collections:
         }
       - { name: title, label: 標題, widget: string }
       - { name: desc, label: 內容說明, widget: text }
+      - {
+          name: url,
+          label: 連結網址,
+          widget: string,
+          required: false,
+          hint: "點擊標題前往的網址（例如該則 Facebook 貼文）。留空則該則不可點",
+        }
 
   - name: testimonials
     label: 學員見證

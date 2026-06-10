@@ -68,8 +68,9 @@ const searchText = (c: CollectionEntry<"courses">) =>
     <div class="course-grid">
       {
         courses.map((c) => (
-          <article
+          <a
             class={"course-card cat-" + c.data.cat}
+            href={withBase("/courses/" + c.id + "/")}
             data-cat={c.data.cat}
             data-search={searchText(c)}
           >
@@ -87,7 +88,10 @@ const searchText = (c: CollectionEntry<"courses">) =>
                 <span class="course-tag">#{t}</span>
               ))}
             </div>
-          </article>
+            <span class="course-more">
+              查看課程 <i class="fa-solid fa-arrow-right" aria-hidden="true" />
+            </span>
+          </a>
         ))
       }
     </div>

@@ -22,7 +22,9 @@ const testimonials = (await getCollection("testimonials")).sort(
       {
         testimonials.map((t) => (
           <figure class="voice-card">
-            <span class="voice-quote" aria-hidden="true">&ldquo;</span>
+            <span class="voice-quote" aria-hidden="true">
+              &ldquo;
+            </span>
             <blockquote>{t.data.q}</blockquote>
             <figcaption class="voice-by">
               <span class="voice-avatar">

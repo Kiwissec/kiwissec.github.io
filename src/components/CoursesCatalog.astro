@@ -10,7 +10,13 @@ const courses = (await getCollection("courses")).sort(
 const catLabel = (id: string) =>
   courseCats.find((c) => c.id === id)?.label ?? "";
 const searchText = (c: CollectionEntry<"courses">) =>
-  (c.data.title + " " + c.data.desc + " " + c.data.tags.join(" ")).toLowerCase();
+  (
+    c.data.title +
+    " " +
+    c.data.desc +
+    " " +
+    c.data.tags.join(" ")
+  ).toLowerCase();
 ---
 
 <header class="page-head">
@@ -21,7 +27,8 @@ const searchText = (c: CollectionEntry<"courses">) =>
   </div>
   <div class="wrap page-head-inner">
     <nav class="crumbs">
-      <a href={withBase("/")}>首頁</a> <span>/</span> 企業資安課程
+      <a href={withBase("/")}>首頁</a>
+      <span>/</span> 企業資安課程
     </nav>
     <h1>企業資安課程</h1>
     <p>{courseIntro}</p>
@@ -119,13 +126,19 @@ const searchText = (c: CollectionEntry<"courses">) =>
   const VALID = ["all", ...COURSE_CAT_IDS];
   const root = document.getElementById("all-courses");
   if (root) {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>(".course-tab"));
-    const cards = Array.from(root.querySelectorAll<HTMLElement>(".course-card"));
+    const tabs = Array.from(
+      root.querySelectorAll<HTMLButtonElement>(".course-tab"),
+    );
+    const cards = Array.from(
+      root.querySelectorAll<HTMLElement>(".course-card"),
+    );
     const grid = root.querySelector<HTMLElement>(".course-grid")!;
     const empty = root.querySelector<HTMLElement>(".course-empty")!;
     const result = root.querySelector<HTMLElement>(".course-result")!;
     const input = root.querySelector<HTMLInputElement>(".course-search-input")!;
-    const clear = root.querySelector<HTMLButtonElement>(".course-search-clear")!;
+    const clear = root.querySelector<HTMLButtonElement>(
+      ".course-search-clear",
+    )!;
 
     const fromUrl = new URLSearchParams(location.search).get("cat") || "all";
     let active = VALID.includes(fromUrl) ? fromUrl : "all";

@@ -18,7 +18,8 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
   </div>
   <div class="wrap page-head-inner">
     <nav class="crumbs">
-      <a href={withBase("/")}>首頁</a> <span>/</span> 最新消息
+      <a href={withBase("/")}>首頁</a>
+      <span>/</span> 最新消息
     </nav>
     <h1>最新消息</h1>
     <p>七維思的活動快訊、課程與社群動態 —— 看看鳥鳥們最近都在忙些什麼。</p>
@@ -52,7 +53,9 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
 <script>
   const root = document.getElementById("all-news");
   if (root) {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>(".course-tab"));
+    const tabs = Array.from(
+      root.querySelectorAll<HTMLButtonElement>(".course-tab"),
+    );
     const cards = Array.from(root.querySelectorAll<HTMLElement>(".news"));
     let active = "全部";
 

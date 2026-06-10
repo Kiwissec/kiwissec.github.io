@@ -23,7 +23,11 @@ const { zh, en, title, description, path } = Astro.props;
       <span class="hero-hex"></span>
     </div>
     <div class="wrap page-head-inner">
-      <nav class="crumbs"><a href={withBase("/")}>首頁</a> <span>/</span> {zh}</nav>
+      <nav class="crumbs">
+        <a href={withBase("/")}>首頁</a>
+        <span>/</span>
+        {zh}
+      </nav>
       <h1>{zh}</h1>
       <p style="color:var(--gray-600);font-size:1.05rem;letter-spacing:.08em">
         {en}

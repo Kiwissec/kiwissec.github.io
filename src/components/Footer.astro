@@ -29,12 +29,20 @@ const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
 
       <nav class="footer-col" aria-label="網站導覽">
         <h4>網站導覽</h4>
-        {footer.about.map(([href, label]) => <a href={withBase(href)}>{label}</a>)}
+        {
+          footer.about.map(([href, label]) => (
+            <a href={withBase(href)}>{label}</a>
+          ))
+        }
       </nav>
 
       <nav class="footer-col" aria-label="政策與條款">
         <h4>政策與條款</h4>
-        {footer.help.map(([href, label]) => <a href={withBase(href)}>{label}</a>)}
+        {
+          footer.help.map(([href, label]) => (
+            <a href={withBase(href)}>{label}</a>
+          ))
+        }
       </nav>
 
       <div class="footer-col footer-contact">

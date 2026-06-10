@@ -46,7 +46,13 @@ collections:
           widget: string,
           hint: "唯一代號，英數與連字號，例如 aw-14；不可與其他課重複，會成為檔名",
         }
-      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - {
+          name: order,
+          label: 顯示順序（小的排前面）,
+          widget: number,
+          value_type: int,
+          min: 0,
+        }
       - name: cat
         label: 分類
         widget: select
@@ -60,7 +66,12 @@ collections:
       - { name: title, label: 課程名稱, widget: string }
       - { name: tags, label: 標籤, widget: list, hint: "至少一個；逐項輸入" }
       - { name: desc, label: 課程簡介, widget: text }
-      - { name: hours, label: 時數, widget: string, hint: "文字即可，例如 1~3 小時" }
+      - {
+          name: hours,
+          label: 時數,
+          widget: string,
+          hint: "文字即可，例如 1~3 小時",
+        }
       # 以下為課程內頁（點卡片後）的延伸內容，皆可留空；留空則內頁僅顯示摘要與洽詢按鈕。
       - {
           name: intro,
@@ -103,7 +114,13 @@ collections:
           widget: string,
           hint: "唯一代號，例如 education；不可重複，會成為檔名",
         }
-      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - {
+          name: order,
+          label: 顯示順序（小的排前面）,
+          widget: number,
+          value_type: int,
+          min: 0,
+        }
       - {
           name: icon,
           label: 圖示 (Font Awesome),
@@ -113,7 +130,12 @@ collections:
       - { name: name, label: 服務名稱, widget: string }
       - { name: short, label: 一句話短說明, widget: string }
       - { name: desc, label: 完整說明, widget: text }
-      - { name: points, label: 重點清單, widget: list, hint: "至少一個；逐項輸入" }
+      - {
+          name: points,
+          label: 重點清單,
+          widget: list,
+          hint: "至少一個；逐項輸入",
+        }
       - name: cta
         label: 按鈕
         widget: list
@@ -121,9 +143,26 @@ collections:
         summary: "{{label}}"
         fields:
           - { name: label, label: 按鈕文字, widget: string }
-          - { name: href, label: 連結, widget: string, hint: "站內用 /courses，外部用完整網址" }
-          - { name: primary, label: 主要按鈕（深色）, widget: boolean, required: false, default: false }
-          - { name: external, label: 外部連結（另開分頁）, widget: boolean, required: false, default: false }
+          - {
+              name: href,
+              label: 連結,
+              widget: string,
+              hint: "站內用 /courses，外部用完整網址",
+            }
+          - {
+              name: primary,
+              label: 主要按鈕（深色）,
+              widget: boolean,
+              required: false,
+              default: false,
+            }
+          - {
+              name: external,
+              label: 外部連結（另開分頁）,
+              widget: boolean,
+              required: false,
+              default: false,
+            }
 
   - name: news
     label: 最新消息
@@ -186,7 +225,13 @@ collections:
           widget: string,
           hint: "唯一代號，例如 t7；不可重複，會成為檔名",
         }
-      - { name: order, label: 顯示順序（小的排前面）, widget: number, value_type: int, min: 0 }
+      - {
+          name: order,
+          label: 顯示順序（小的排前面）,
+          widget: number,
+          value_type: int,
+          min: 0,
+        }
       - { name: q, label: 見證內容, widget: text }
       - { name: who, label: 身分, widget: string, hint: "例如 軟體工程師" }
       - {

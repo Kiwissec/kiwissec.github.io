@@ -36,7 +36,11 @@ const isCurrent = (href: string) => {
         nav.map((n) =>
           n.children ? (
             <li class="nav-group">
-              <button class="nav-grouptop" aria-haspopup="true" aria-expanded="false">
+              <button
+                class="nav-grouptop"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
                 {n.label} <i class="fa-solid fa-chevron-down nav-caret" />
               </button>
               <ul class="nav-dropdown">
@@ -120,9 +124,9 @@ const isCurrent = (href: string) => {
   });
 
   // Close the mobile menu after following any link.
-  nav?.querySelectorAll(".nav-links a").forEach((a) =>
-    a.addEventListener("click", () => setMenu(false)),
-  );
+  nav
+    ?.querySelectorAll(".nav-links a")
+    .forEach((a) => a.addEventListener("click", () => setMenu(false)));
 
   // Close on Escape.
   document.addEventListener("keydown", (e) => {

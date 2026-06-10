@@ -63,11 +63,15 @@ for (const [name, items] of Object.entries(collections)) {
   items.forEach((item, i) => {
     const id = item?.id;
     if (typeof id !== "string" || id.trim() === "") {
-      fail(`[${name}] item #${i} has no valid "id" — file() would silently drop it`);
+      fail(
+        `[${name}] item #${i} has no valid "id" — file() would silently drop it`,
+      );
       return;
     }
     if (seen.has(id)) {
-      fail(`[${name}] duplicate id "${id}" (#${seen.get(id)} and #${i}) — later overwrites earlier`);
+      fail(
+        `[${name}] duplicate id "${id}" (#${seen.get(id)} and #${i}) — later overwrites earlier`,
+      );
     } else {
       seen.set(id, i);
     }
@@ -84,7 +88,9 @@ for (const name of ["courses", "services", "testimonials"]) {
       continue;
     }
     if (seen.has(order)) {
-      fail(`[${name}] duplicate order ${order} ("${seen.get(order)}" and "${item.id}") — unstable render order`);
+      fail(
+        `[${name}] duplicate order ${order} ("${seen.get(order)}" and "${item.id}") — unstable render order`,
+      );
     } else {
       seen.set(order, item.id);
     }
@@ -99,11 +105,15 @@ for (const item of collections.news) {
     continue;
   }
   if (/[\\/]/.test(img) || img.includes("..")) {
-    fail(`[news] "${item.id}" img "${img}" must be a bare filename (no "/" or "..")`);
+    fail(
+      `[news] "${item.id}" img "${img}" must be a bare filename (no "/" or "..")`,
+    );
     continue;
   }
   if (!isFile(`public/assets/news/${img}`)) {
-    fail(`[news] "${item.id}" img "${img}" is not a file under public/assets/news/ — renders a broken image with no build error`);
+    fail(
+      `[news] "${item.id}" img "${img}" is not a file under public/assets/news/ — renders a broken image with no build error`,
+    );
   }
 }
 
@@ -121,7 +131,9 @@ const declaredCats = catMatch
   ? [...catMatch[1].matchAll(/["']([^"']+)["']/g)].map((m) => m[1])
   : [];
 if (declaredCats.length === 0) {
-  fail(`[course-cats] could not read COURSE_CAT_IDS from src/data/course-cats.ts`);
+  fail(
+    `[course-cats] could not read COURSE_CAT_IDS from src/data/course-cats.ts`,
+  );
 }
 // Strip CSS comments, then match a real selector token (not a substring) so
 // ".cat-awarenessX" or "/* .cat-foo */" don't falsely satisfy ".cat-foo".
@@ -131,7 +143,9 @@ const css = readFileSync(new URL("src/styles/site.css", root), "utf8").replace(
 );
 for (const cat of declaredCats) {
   if (!new RegExp(`\\.cat-${cat}(?![\\w-])`).test(css)) {
-    fail(`[course-cats] category "${cat}" has no ".cat-${cat}" rule in src/styles/site.css — cards render uncoloured`);
+    fail(
+      `[course-cats] category "${cat}" has no ".cat-${cat}" rule in src/styles/site.css — cards render uncoloured`,
+    );
   }
 }
 

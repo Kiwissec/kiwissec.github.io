@@ -1,0 +1,16 @@
+# 舊站封存快照：凍結，不重排版（與 pre-commit 全域 exclude 一致）
+old-website/
+
+# 產物與快取
+dist/
+.astro/
+test-results/
+playwright-report/
+tmp/
+
+# 機器產生檔
+package-lock.json
+
+# 內容 collections：public repo（CMS）為來源權威，private 僅為 seed，
+# 不重排版以免與 public 產生無意義 drift
+src/data/*/

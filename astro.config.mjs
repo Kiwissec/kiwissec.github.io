@@ -9,5 +9,10 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://kiwissec.github.io",
   base: "/",
+  // 與預設 build.format 'directory' 對齊：頁面最終網址皆為尾斜線形式
+  // （GitHub Pages 對 /services 會 301 至 /services/）。站內連結與 canonical
+  // 由 src/lib/site.ts 的 withBase() 統一補尾斜線；含副檔名的 endpoints
+  // （robots.txt 等）不受此設定影響。
+  trailingSlash: "always",
   integrations: [sitemap()],
 });

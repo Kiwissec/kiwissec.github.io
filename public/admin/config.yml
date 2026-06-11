@@ -14,12 +14,13 @@ backend:
   repo: Kiwissec/kiwissec.github.io
   branch: content
   # OAuth token-exchange worker (authorization code flow): the deployed
-  # sveltia-cms-auth Worker. See docs/維護指南.md「前置設定（工程師）」.
+  # sveltia-cms-auth Cloudflare Worker. If the worker is redeployed or moved,
+  # update this URL (and the GitHub OAuth App callback) together.
   base_url: https://sveltia-cms-auth.kiwissec.workers.dev
 
 # (Sveltia ignores Decap's `local_backend` and supports no proxy server; for
-# local testing it uses the File System Access API "Work with Local Repository"
-# in a Chromium browser — see docs/維護指南.md「本機驗證」.)
+# local testing, open /admin/ in a Chromium browser and use the File System
+# Access API "Work with Local Repository" flow against a local clone.)
 
 # Global media library target for news images. Editors upload here; the news
 # `img` field keeps the BARE filename (the site prepends the path), so it stays

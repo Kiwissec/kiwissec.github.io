@@ -22,7 +22,8 @@ import { withBase } from "../lib/site";
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <span class="eyebrow"
-        ><i class="fa-solid fa-shield-halved"></i> 把複雜的資安，講得簡單</span
+        ><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        把複雜的資安，講得簡單</span
       >
       <h1>
         <span class="hero-brand">{hero.brand}</span><span class="hl"
@@ -32,7 +33,8 @@ import { withBase } from "../lib/site";
       <p>{hero.desc}</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href={withBase("/courses")}>
-          了解企業課程 <i class="fa-solid fa-arrow-right"></i>
+          了解企業課程 <i class="fa-solid fa-arrow-right" aria-hidden="true"
+          ></i>
         </a>
         <a class="btn btn-ghost" href="#contact">聯絡我們</a>
       </div>
@@ -59,6 +61,6 @@ import { withBase } from "../lib/site";
     </div>
   </div>
   <a class="hero-scroll" href="#about" aria-label="向下捲動">
-    <i class="fa-solid fa-chevron-down"></i>
+    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
   </a>
 </section>

@@ -8,9 +8,15 @@ interface Props {
   description: string;
   /** Route of this page, e.g. "/", "/services" — used for canonical / og:url. */
   path: string;
+  /**
+   * Utility pages（404）沒有權威網址：內容會在任意未知路徑下渲染（status
+   * 404），而 dist/404.html 又可被直接以 200 存取。設此 flag 後輸出
+   * noindex meta、並略過 canonical 與 og:url，避免宣告指向死網址的訊號。
+   */
+  noindex?: boolean;
 }
 
-const { title, description, path } = Astro.props;
+const { title, description, path, noindex = false } = Astro.props;
 const canonical = absoluteUrl(path, Astro.site);
 const ogImage = absoluteUrl("/assets/og_image.webp", Astro.site);
 
@@ -44,7 +50,8 @@ const orgLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href={withBase("/assets/logo.ico")} />
 
     <meta property="og:type" content="website" />
@@ -52,22 +59,29 @@ const orgLd = {
     <meta property="og:locale" content="zh_TW" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- Fonts (v1: CDN; self-hosting tracked as follow-up) + Font Awesome -->
+    <!-- Fonts (v1: CDN; self-hosting tracked as follow-up) + Font Awesome.
+         Stylesheets are version-pinned with SRI (immutable versioned URLs);
+         bumping a version requires recomputing the integrity hash. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn/dist/MapleMono-CN-Regular/result.css"
+      href="https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn@2.0.0/dist/MapleMono-CN-Regular/result.css"
+      integrity="sha384-KPXr9DpeoVjpiUvGwWHz7/C1vx0Bl1RPbLJgGcHloj7YQBi7PBDlKHA3ilDDIeYu"
+      crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
     />
 
     <script

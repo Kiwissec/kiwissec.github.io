@@ -92,8 +92,8 @@ export const about = {
 };
 
 // ── 企業資安課程（B2B）──
-// 課程資料已移至 Content Collection（src/data/courses.json；schema 見
-// src/content.config.ts），依官方《資訊與資安課程型錄 v20260503》：資安意識 13 +
+// 課程資料已移至 Content Collection（src/data/courses/*.json 每筆一檔；schema
+// 見 src/content.config.ts），依官方《資訊與資安課程型錄 v20260503》：資安意識 13 +
 // 攻防演練 9 + 資安防護 4。以下 courseCats 為分類 UI／篩選字彙（含合成的 "all"），
 // 其 id 對應 courses 的 cat enum（awareness / offensive / defensive）。
 export const courseIntro =

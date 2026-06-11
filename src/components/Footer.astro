@@ -48,13 +48,19 @@ const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
       <div class="footer-col footer-contact">
         <h4>聯絡資訊</h4>
         <a href={"mailto:" + footer.email}>
-          <i class="fa-solid fa-envelope"></i><span>{footer.email}</span>
+          <i class="fa-solid fa-envelope" aria-hidden="true"></i><span
+            >{footer.email}</span
+          >
         </a>
         <a href={telHref}>
-          <i class="fa-solid fa-phone"></i><span>{footer.phone}</span>
+          <i class="fa-solid fa-phone" aria-hidden="true"></i><span
+            >{footer.phone}</span
+          >
         </a>
         <div class="footer-addr">
-          <i class="fa-solid fa-location-dot"></i><span>{footer.addr}</span>
+          <i class="fa-solid fa-location-dot" aria-hidden="true"></i><span
+            >{footer.addr}</span
+          >
         </div>
         <span class="footer-follow">追蹤我們</span>
         <div class="socials">
@@ -66,7 +72,7 @@ const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
                 rel="noopener"
                 aria-label={icon.replace("fa-", "")}
               >
-                <i class={"fa-brands " + icon} />
+                <i class={"fa-brands " + icon} aria-hidden="true" />
               </a>
             ))
           }

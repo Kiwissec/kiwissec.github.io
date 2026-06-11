@@ -33,7 +33,7 @@ const services = (await getCollection("services")).sort(
         <article class="svc-row" id={s.id}>
           <div class="svc-aside">
             <span class="svc-icon">
-              <i class={s.data.icon} />
+              <i class={s.data.icon} aria-hidden="true" />
             </span>
           </div>
           <div class="svc-body">
@@ -43,7 +43,7 @@ const services = (await getCollection("services")).sort(
             <ul class="svc-points">
               {s.data.points.map((p) => (
                 <li>
-                  <i class="fa-solid fa-circle-check" />
+                  <i class="fa-solid fa-circle-check" aria-hidden="true" />
                   <span>{p}</span>
                 </li>
               ))}
@@ -57,7 +57,9 @@ const services = (await getCollection("services")).sort(
                   rel={c.external ? "noopener" : undefined}
                 >
                   {c.label}
-                  {c.primary && <i class="fa-solid fa-arrow-right" />}
+                  {c.primary && (
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true" />
+                  )}
                 </a>
               ))}
             </div>

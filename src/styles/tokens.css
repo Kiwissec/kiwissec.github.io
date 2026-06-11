@@ -19,41 +19,46 @@
    Loading strategy (resilient, progressive):
      1. Maple Mono LATIN  — Fontsource woff2 (reliable). Carries Latin,
         numerals, symbols, code — where Maple's character shows most.
-     2. Maple Mono CN     — full Traditional-Chinese webfont, loaded via
-        @import above. Upgrades CJK to Maple.
+     2. Maple Mono CN     — full Traditional-Chinese webfont, loaded via a
+        <link> in the Base layout head. Upgrades CJK to Maple.
      3. Open Huninn       — guaranteed, on-brand ROUNDED CJK fallback so
         Chinese always renders warmly even if (2) is unavailable.
    v1 loads these via CDN; self-hosting is tracked as a follow-up
    (see fonts/README.md in the design bundle).
    ============================================================ */
 
+/* @font-face has no SRI mechanism, so font URLs are pinned to immutable
+   versioned CDN paths instead of mutable tags (@latest / @master); bump the
+   version in the URL deliberately, via PR. */
+
 /* 1. Maple Mono — Latin (reliable) */
 @font-face {
   font-family: "Maple Mono";
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-400-normal.woff2)
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@5.2.6/latin-400-normal.woff2)
     format("woff2");
   font-display: swap;
   font-weight: 400;
 }
 @font-face {
   font-family: "Maple Mono";
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-500-normal.woff2)
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@5.2.6/latin-500-normal.woff2)
     format("woff2");
   font-display: swap;
   font-weight: 500;
 }
 @font-face {
   font-family: "Maple Mono";
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@latest/latin-700-normal.woff2)
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/maple-mono@5.2.6/latin-700-normal.woff2)
     format("woff2");
   font-display: swap;
   font-weight: 700;
 }
 
-/* 3. Open Huninn — rounded CJK fallback / long-form reading alt */
+/* 3. Open Huninn — rounded CJK fallback / long-form reading alt.
+   Pinned to the v1.1 release (same file the site has always served). */
 @font-face {
   font-family: "Open Huninn";
-  src: url(https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-1.1.ttf)
+  src: url(https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@v1.1/font/jf-openhuninn-1.1.ttf)
     format("truetype");
   font-display: swap;
   font-weight: 400 700;
@@ -112,8 +117,9 @@
   /* ---------- TYPE ----------
        Primary face is Maple Mono. 'Maple Mono' (Latin) is declared via
        @font-face below, so it's the project-recognized primary; the CN
-       names that follow are served by the remote @import and kick in
-       per-glyph for CJK, with Open Huninn as the guaranteed CJK floor. */
+       names that follow are served by the Base layout's <link> stylesheet
+       and kick in per-glyph for CJK, with Open Huninn as the guaranteed
+       CJK floor. */
   --font-sans:
     "Maple Mono", "Maple Mono NF CN", "Maple Mono CN", "MapleMono-CN-Regular",
     "Open Huninn", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",

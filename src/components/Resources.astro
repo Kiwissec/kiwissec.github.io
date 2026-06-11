@@ -12,13 +12,16 @@ import { resources, resourceIntro } from "../data/site";
         resources.map((r) => (
           <a class="res-card" href={r.href} target="_blank" rel="noopener">
             <span class="res-ico">
-              <i class={r.icon} />
+              <i class={r.icon} aria-hidden="true" />
             </span>
             <span class="res-body">
               <span class="res-tag">{r.tag}</span>
               <span class="res-name">
                 {r.name}
-                <i class="fa-solid fa-arrow-up-right-from-square res-ext" />
+                <i
+                  class="fa-solid fa-arrow-up-right-from-square res-ext"
+                  aria-hidden="true"
+                />
               </span>
               <span class="res-desc">{r.desc}</span>
             </span>

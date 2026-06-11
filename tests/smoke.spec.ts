@@ -83,6 +83,83 @@ test.describe("every page loads cleanly", () => {
   }
 });
 
+test.describe("legal pages show their last-updated date", () => {
+  for (const route of ["/policy/", "/terms/", "/consumer/", "/return/"]) {
+    test(`${route} renders the legal-updated line`, async ({ page }) => {
+      await page.goto(route);
+      await expect(page.locator(".legal-updated")).toContainText(
+        "最後更新日期",
+      );
+    });
+  }
+});
+
+test("unknown routes get the branded 404 page", async ({ page }) => {
+  const resp = await page.goto("/no-such-page/");
+  expect(resp?.status()).toBe(404);
+  await expect(page.locator(".nav-brand")).toBeVisible();
+  await expect(page.locator("h1")).toContainText("找不到頁面");
+  await expect(page.locator("footer.footer")).toBeVisible();
+  // The 404 content renders at arbitrary URLs (and /404.html answers 200), so
+  // it must not advertise indexable signals: noindex, no canonical, no og:url.
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    /noindex/,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
+});
+
+test("sitemap lists real pages and excludes the 404 page", async ({
+  request,
+}) => {
+  // Pins @astrojs/sitemap's automatic 404 exclusion so a future major bump
+  // can't silently start advertising the 404 page (or drop real pages).
+  const resp = await request.get("/sitemap-0.xml");
+  expect(resp.status()).toBe(200);
+  const xml = await resp.text();
+  expect(xml).toContain("/services/");
+  expect(xml).not.toContain("/404/");
+});
+
+test.describe("canonical and og:url name the final trailing-slash URL", () => {
+  // `site` differs between preview (127.0.0.1) and production, so compare
+  // pathnames: the canonical must use the same trailing-slash form the page is
+  // actually served at (and that the sitemap declares), not a 301 source.
+  for (const route of ["/", "/services/", `/courses/${courses[0].id}/`]) {
+    test(`${route} canonical matches the served path`, async ({ page }) => {
+      await page.goto(route);
+      const canonical = await page
+        .locator('link[rel="canonical"]')
+        .getAttribute("href");
+      expect(canonical).toBeTruthy();
+      expect(new URL(canonical!).pathname).toBe(new URL(page.url()).pathname);
+      const ogUrl = await page
+        .locator('meta[property="og:url"]')
+        .getAttribute("content");
+      expect(ogUrl).toBe(canonical);
+    });
+  }
+});
+
+test("internal nav and footer links use the trailing-slash form", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const hrefs = await page
+    .locator(".nav-links a, footer.footer a")
+    .evaluateAll((els) => els.map((el) => el.getAttribute("href") ?? ""));
+  const internalPages = hrefs.filter(
+    (h) => h.startsWith("/") && !h.includes("#"),
+  );
+  expect(internalPages.length).toBeGreaterThan(0);
+  for (const href of internalPages) {
+    expect(href, `${href} should end with a trailing slash`).toMatch(
+      /\/(\?.*)?$/,
+    );
+  }
+});
+
 test("home matches the design composition", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".hero-brand")).toHaveText("七維思資安");

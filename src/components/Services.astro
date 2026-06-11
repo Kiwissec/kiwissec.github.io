@@ -16,12 +16,12 @@ const services = (await getCollection("services")).sort(
         services.map((s) => (
           <a class="prod prod-link" href={withBase("/services#" + s.id)}>
             <div class="prod-disk">
-              <i class={s.data.icon} />
+              <i class={s.data.icon} aria-hidden="true" />
             </div>
             <h3>{s.data.name}</h3>
             <p>{s.data.short}</p>
             <span class="prod-go">
-              了解更多 <i class="fa-solid fa-arrow-right" />
+              了解更多 <i class="fa-solid fa-arrow-right" aria-hidden="true" />
             </span>
           </a>
         ))

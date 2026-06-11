@@ -18,13 +18,13 @@ const count = (id: string) => courses.filter((c) => c.data.cat === id).length;
         COURSE_CAT_IDS.map((id) => (
           <a class={"cat-card cat-" + id} href={withBase("/courses?cat=" + id)}>
             <span class="cat-card-ico">
-              <i class={COURSE_CAT_META[id].icon} />
+              <i class={COURSE_CAT_META[id].icon} aria-hidden="true" />
             </span>
             <span class="cat-card-name">{COURSE_CAT_META[id].label}</span>
             <span class="cat-card-desc">{COURSE_CAT_META[id].blurb}</span>
             <span class="cat-card-count">{count(id)} 門課程</span>
             <span class="cat-card-go">
-              查看課程 <i class="fa-solid fa-arrow-right" />
+              查看課程 <i class="fa-solid fa-arrow-right" aria-hidden="true" />
             </span>
           </a>
         ))
@@ -34,7 +34,8 @@ const count = (id: string) => courses.filter((c) => c.data.cat === id).length;
       <p>所有課程皆可依企業需求客製安排內訓。</p>
       <div class="courses-foot-cta">
         <a class="btn btn-primary" href={withBase("/courses")}>
-          瀏覽完整課程 <i class="fa-solid fa-arrow-right"></i>
+          瀏覽完整課程 <i class="fa-solid fa-arrow-right" aria-hidden="true"
+          ></i>
         </a>
         <a class="btn btn-ghost" href="#contact">洽詢企業內訓</a>
       </div>

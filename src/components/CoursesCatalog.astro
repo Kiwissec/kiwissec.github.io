@@ -38,7 +38,9 @@ const searchText = (c: CollectionEntry<"courses">) =>
 <section class="section section-flush" id="all-courses">
   <div class="wrap">
     <div class="course-search">
-      <i class="fa-solid fa-magnifying-glass course-search-ico"></i>
+      <i
+        class="fa-solid fa-magnifying-glass course-search-ico"
+        aria-hidden="true"></i>
       <input
         type="search"
         class="course-search-input"
@@ -46,7 +48,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
         aria-label="搜尋課程"
       />
       <button class="course-search-clear" aria-label="清除搜尋" hidden>
-        <i class="fa-solid fa-xmark"></i>
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </div>
 
@@ -70,7 +72,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
       }
     </div>
 
-    <p class="course-result">共 {courses.length} 門課程</p>
+    <p class="course-result" aria-live="polite">共 {courses.length} 門課程</p>
 
     <div class="course-grid">
       {
@@ -104,7 +106,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
     </div>
 
     <div class="course-empty" hidden>
-      <i class="fa-solid fa-magnifying-glass"></i>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
       <p>找不到符合的課程，換個關鍵字或分類再試試。</p>
       <button class="btn btn-ghost" data-reset>清除條件</button>
     </div>
@@ -113,7 +115,8 @@ const searchText = (c: CollectionEntry<"courses">) =>
       <p>所有課程皆可依企業需求客製安排。</p>
       <div class="courses-foot-cta">
         <a class="btn btn-primary" href={withBase("/#contact")}>
-          洽詢企業內訓 <i class="fa-solid fa-arrow-right"></i>
+          洽詢企業內訓 <i class="fa-solid fa-arrow-right" aria-hidden="true"
+          ></i>
         </a>
       </div>
     </div>

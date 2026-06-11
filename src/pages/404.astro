@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { withBase } from "../lib/site";
+
+// GitHub Pages 對不存在的路徑會回傳根目錄的 404.html（本頁建置產物），
+// 讓訪客（含舊站失效連結）落在品牌頁而非平台預設錯誤頁。
+const title = "找不到頁面 — 七維思 Kiwis";
+const description =
+  "您要找的頁面不存在或已搬家。歡迎回到首頁，或看看七維思的企業資安課程。";
+---
+
+<Base title={title} description={description} path="/404" noindex>
+  <Navbar />
+
+  <header class="page-head">
+    <div class="page-head-bg" aria-hidden="true">
+      <span class="blob blob-cream"></span>
+      <span class="blob blob-kiwi"></span>
+      <span class="hero-hex"></span>
+    </div>
+    <div class="wrap page-head-inner">
+      <nav class="crumbs">
+        <a href={withBase("/")}>首頁</a>
+        <span>/</span> 404
+      </nav>
+      <h1>找不到頁面</h1>
+      <p>
+        您要找的頁面不存在、已搬家，或網址打錯了。別擔心，鳥鳥帶您回到正路。
+      </p>
+    </div>
+  </header>
+
+  <section class="section section-flush">
+    <div class="wrap courses-foot">
+      <p>可以從這裡繼續：</p>
+      <div class="courses-foot-cta">
+        <a class="btn btn-primary" href={withBase("/")}>
+          回到首頁 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+        <a class="btn btn-ghost" href={withBase("/courses")}>瀏覽企業課程</a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

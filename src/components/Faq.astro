@@ -12,7 +12,7 @@ import { faq } from "../data/site";
           <div class={"faq-item" + (i === 0 ? " open" : "")}>
             <button class="faq-q" aria-expanded={i === 0 ? "true" : "false"}>
               <span>{f.q}</span>
-              <i class="fa-solid fa-plus" />
+              <i class="fa-solid fa-plus" aria-hidden="true" />
             </button>
             <div class="faq-a">
               <div class="faq-a-inner">{f.a}</div>

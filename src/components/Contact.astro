@@ -18,7 +18,7 @@ import { contact } from "../data/site";
               rel={m.href.startsWith("http") ? "noopener" : undefined}
             >
               <span class="contact-ico">
-                <i class={m.icon} />
+                <i class={m.icon} aria-hidden="true" />
               </span>
               <span class="contact-text">
                 <span class="contact-label">{m.label}</span>

@@ -1,6 +1,6 @@
 // Kiwissec website — stable site singletons & fixed UI copy (nav, hero, about,
-// faq, contact, footer, resources, company). Dynamic collections (courses,
-// services, news, testimonials) live in src/data/*.json; see content.config.ts.
+// contact, footer, resources, company). Dynamic collections (courses, services,
+// news, testimonials, faq) live in src/data/*.json; see content.config.ts.
 // Ported from the design bundle's ui_kits/website/data.js.
 // Sources: old-website (archived) + kiwissec.com (參考，2026-06 擷取整理；
 // 內容可能已改版，上線前以公司最新資訊為準). Internal hrefs use Astro
@@ -31,10 +31,6 @@ export interface ResourceItem {
   desc: string;
   href: string;
 }
-export interface Faq {
-  q: string;
-  a: string;
-}
 export interface ContactMethod {
   icon: string;
   label: string;
@@ -46,7 +42,7 @@ export const nav: NavItem[] = [
   {
     label: "企業資安",
     children: [
-      { label: "資安、資訊服務", href: "/services" },
+      { label: "資訊安全服務", href: "/services" },
       { label: "資訊安全教育訓練課程", href: "/courses" },
     ],
   },
@@ -114,42 +110,27 @@ export const resources: ResourceItem[] = [
     icon: "fa-solid fa-code-branch",
     name: "SSDLC 資源",
     tag: "開放資源",
-    desc: "安全軟體開發生命週期（SSDLC）的開放知識與實務資源。",
+    desc: "安全軟體開發生命週期（SSDLC）的開放知識與實務資源",
     href: "https://ssdlc.feifei.tw/",
   },
   {
     icon: "fa-solid fa-tower-broadcast",
     name: "免費每月資安直播",
     tag: "免費直播",
-    desc: "每月一場免費資安直播，與飛飛一起聊最新資安議題。",
+    desc: "每月一場免費資安直播，與飛飛一起聊最新資安議題",
     href: "https://feifei.tw/course/free-information-security-live-broadcast/",
   },
   {
     icon: "fa-solid fa-user-graduate",
     name: "個人資安課程",
     tag: "線上課程",
-    desc: "飛飛的個人線上課程平台，從基礎到進階自主學習。",
+    desc: "飛飛的個人線上課程平台，從基礎到進階自主學習",
     href: "https://feifei.tw/",
   },
 ];
 
-export const faq: Faq[] = [
-  {
-    q: "我們是誰？",
-    a: "七維思成員具有多年教育訓練經驗，含有業界實作能量，能提供學員所需要的教育方式。",
-  },
-  {
-    q: "我們提供什麼？",
-    a: "七維思提供資安學習課程，帶給學員所需的資安技術，包含攻擊與防禦實作。",
-  },
-  {
-    q: "課程類型？",
-    a: "課程分為三大類：適合全員的「資安意識」培訓、技術人員的「攻防演練」（滲透測試、紅隊、網站與物聯網安全），以及「資安防護」（資安維運、DevSecOps、雲端與事件應變）。皆可依產業與角色客製。",
-  },
-];
-
 export const contact = {
-  lead: "想合作、洽詢企業內訓，或單純想跟鳥鳥聊聊資安？歡迎透過以下方式找到我們。",
+  lead: "想合作、洽詢企業內訓，或單純想跟奇異鳥聊聊資安？歡迎透過以下方式找到我們～",
   methods: [
     {
       icon: "fa-solid fa-envelope",

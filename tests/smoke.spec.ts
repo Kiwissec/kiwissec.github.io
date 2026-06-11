@@ -12,6 +12,7 @@ const courses = loadCollection("courses");
 const news = loadCollection("news");
 const services = loadCollection("services");
 const testimonials = loadCollection("testimonials");
+const faq = loadCollection("faq");
 
 const coursesInCat = (cat: string) =>
   courses.filter((c) => c.cat === cat).length;
@@ -80,6 +81,33 @@ test.describe("every page loads cleanly", () => {
       await expect(page.locator("footer.footer")).toBeVisible();
       expect(errors, errors.join("\n")).toEqual([]);
     });
+  }
+});
+
+test("brand assets use the hat-gold set and resolve", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".nav-mark")).toHaveAttribute(
+    "src",
+    /mark-hat-gold\.png$/,
+  );
+  await expect(page.locator(".footer-logo")).toHaveAttribute(
+    "src",
+    /lockup-stacked-hat-gold\.png$/,
+  );
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+    "href",
+    /logo\.ico$/,
+  );
+  for (const path of [
+    "/assets/logos/mark-hat-gold.png",
+    "/assets/logos/lockup-stacked-hat-gold.png",
+    "/assets/logo.ico",
+    "/assets/og_image.webp",
+  ]) {
+    expect((await request.get(path)).status(), path).toBe(200);
   }
 });
 
@@ -168,6 +196,7 @@ test("home matches the design composition", async ({ page }) => {
   await expect(page.locator(".cat-card")).toHaveCount(COURSE_CAT_IDS.length); // course categories
   await expect(page.locator(".voice-card")).toHaveCount(testimonials.length); // testimonials
   await expect(page.locator(".res-card")).toHaveCount(resources.length); // learning resources
+  await expect(page.locator(".faq-item")).toHaveCount(faq.length); // faq entries
   await expect(page.locator("#news")).toHaveCount(0); // news removed from landing
 });
 
@@ -177,10 +206,16 @@ test("courses: category filter, search and ?cat= deep-link", async ({
   await page.goto("/courses/");
   await expect(page.locator(".course-card")).toHaveCount(courses.length);
 
+  // every card badge carries its category icon (colour-independent encoding)
+  await expect(page.locator(".course-cat i")).toHaveCount(courses.length);
+
   await page.click(`.course-tab[data-cat="${FILTER_CAT}"]`);
   await expect(page.locator(".course-card:visible")).toHaveCount(
     coursesInCat(FILTER_CAT),
   );
+  await expect(
+    page.locator(".course-card:visible .course-cat i").first(),
+  ).toHaveClass(COURSE_CAT_META[FILTER_CAT].icon);
 
   await page.click('.course-tab[data-cat="all"]');
   await page.fill(".course-search-input", SEARCH_TERM);
@@ -203,11 +238,15 @@ test("news tag filter narrows the list", async ({ page }) => {
 });
 
 test("faq accordion keeps a single panel open", async ({ page }) => {
+  // Switching panels needs a second item; with one item the click would just
+  // toggle the open panel closed, which is a different behaviour to assert.
+  test.skip(faq.length < 2, "needs at least two FAQ items to switch between");
+  const last = faq.length - 1;
   await page.goto("/");
   await expect(page.locator(".faq-item.open")).toHaveCount(1);
-  await page.locator(".faq-q").nth(2).click();
+  await page.locator(".faq-q").nth(last).click();
   await expect(page.locator(".faq-item.open")).toHaveCount(1);
-  await expect(page.locator(".faq-item").nth(2)).toHaveClass(/open/);
+  await expect(page.locator(".faq-item").nth(last)).toHaveClass(/open/);
 });
 
 test("mobile navigation opens the offcanvas menu", async ({
@@ -243,12 +282,39 @@ test("aria-current marks only the real current page", async ({ page }) => {
   );
 });
 
-test("news items with a url link to their source post in a new tab", async ({
+test("news cards open an on-page dialog with the full story", async ({
+  page,
+}) => {
+  await page.goto("/news/");
+  // every item is openable in-site now (url no longer gates clickability)
+  await expect(page.locator(".news .news-link")).toHaveCount(news.length);
+
+  const card = page.locator(".news").first();
+  const dialog = card.locator(".news-dialog");
+  const cardTitle = await card.locator(".news-link").innerText();
+
+  await card.locator(".news-link").click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".news-dialog-title")).toHaveText(cardTitle);
+
+  // close button restores focus to the opener
+  await dialog.locator(".news-dialog-close").click();
+  await expect(dialog).toBeHidden();
+  await expect(card.locator(".news-link")).toBeFocused();
+
+  // native <dialog> Escape handling still applies
+  await card.locator(".news-link").click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});
+
+test("news dialogs keep the source post link external and safe", async ({
   page,
 }) => {
   test.skip(newsWithUrl.length === 0, "no news item has a url");
   await page.goto("/news/");
-  const links = page.locator(".news .news-link");
+  const links = page.locator(".news-dialog-src");
   await expect(links).toHaveCount(newsWithUrl.length);
   const first = links.first();
   await expect(first).toHaveAttribute("target", "_blank");

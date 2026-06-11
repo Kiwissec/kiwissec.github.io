@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import { courseCats, courseIntro } from "../data/site";
+import { COURSE_CAT_META, type CourseCatId } from "../data/course-cats";
 import { withBase } from "../lib/site";
 
 const courses = (await getCollection("courses")).sort(
@@ -84,7 +85,13 @@ const searchText = (c: CollectionEntry<"courses">) =>
             data-search={searchText(c)}
           >
             <div class="course-card-top">
-              <span class="course-cat">{catLabel(c.data.cat)}</span>
+              <span class="course-cat">
+                <i
+                  class={COURSE_CAT_META[c.data.cat as CourseCatId].icon}
+                  aria-hidden="true"
+                />
+                {catLabel(c.data.cat)}
+              </span>
               <span class="course-hours">
                 <i class="fa-regular fa-clock" aria-hidden="true" />
                 {c.data.hours}

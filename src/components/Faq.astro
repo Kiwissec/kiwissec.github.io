@@ -1,6 +1,10 @@
 ---
 import SectionHead from "./SectionHead.astro";
-import { faq } from "../data/site";
+import { getCollection } from "astro:content";
+
+const faq = (await getCollection("faq")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <section class="section" id="faq">
@@ -11,11 +15,11 @@ import { faq } from "../data/site";
         faq.map((f, i) => (
           <div class={"faq-item" + (i === 0 ? " open" : "")}>
             <button class="faq-q" aria-expanded={i === 0 ? "true" : "false"}>
-              <span>{f.q}</span>
+              <span>{f.data.q}</span>
               <i class="fa-solid fa-plus" aria-hidden="true" />
             </button>
             <div class="faq-a">
-              <div class="faq-a-inner">{f.a}</div>
+              <div class="faq-a-inner">{f.data.a}</div>
             </div>
           </div>
         ))

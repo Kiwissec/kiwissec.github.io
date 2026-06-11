@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import { courseCats } from "../../data/site";
+import { COURSE_CAT_META } from "../../data/course-cats";
 import { withBase } from "../../lib/site";
 
 export async function getStaticPaths() {
@@ -47,7 +48,10 @@ const introParas = (c.intro ?? "")
       </nav>
       <h1>{c.title}</h1>
       <div class={"course-detail-meta cat-" + c.cat}>
-        <span class="course-cat">{catLabel}</span>
+        <span class="course-cat">
+          <i class={COURSE_CAT_META[c.cat].icon} aria-hidden="true"></i>
+          {catLabel}
+        </span>
         <span class="course-hours">
           <i class="fa-regular fa-clock" aria-hidden="true"></i>
           {c.hours}

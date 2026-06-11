@@ -28,6 +28,26 @@ backend:
 media_folder: public/assets/news
 public_folder: /assets/news
 
+# 上傳即自動轉檔（Sveltia 內建 image optimizer，v0.68.0 起）：支援的 raster 圖
+# （JPG/PNG/GIF/AVIF/WebP）在「瀏覽器端、commit 前」轉成 webp 並縮到最大邊
+# 1600px，檔名主體不變、副檔名改 .webp。注意這不是保證——HEIC（iPhone 預設
+# 格式）等不支援的格式、或繞過 CMS 直接 push 的檔案會原樣落地；「news 圖必為
+# WebP」的不變量由 audit:content 的檢查（副檔名＋magic bytes）在 CI 強制，
+# 維護指南也提醒編輯者先把 HEIC 轉存。
+# max_file_size 套用在「轉檔後」的結果，擋的是轉不了檔或壓不下來的異常檔。
+media_libraries:
+  default:
+    config:
+      max_file_size: 512000
+      transformations:
+        raster_image:
+          format: webp
+          quality: 85
+          width: 1600
+          height: 1600
+        svg:
+          optimize: true
+
 collections:
   - name: courses
     label: 課程
@@ -205,7 +225,7 @@ collections:
           label: 連結網址,
           widget: string,
           required: false,
-          hint: "點擊標題前往的網址（例如該則 Facebook 貼文）。留空則該則不可點",
+          hint: "原始貼文網址（例如該則 Facebook 貼文）。點擊卡片會開啟站內彈出卡顯示完整內容；有填網址時彈出卡內會多一個「前往 Facebook 原文」按鈕，留空則只顯示站內內容",
         }
 
   - name: testimonials
@@ -241,3 +261,31 @@ collections:
           widget: string,
           hint: "一般不用改；不確定請找工程師",
         }
+
+  - name: faq
+    label: 常見問題
+    label_singular: 問答
+    folder: src/data/faq
+    format: json
+    extension: json
+    identifier_field: id
+    slug: "{{fields.id}}"
+    create: true
+    delete: true
+    summary: "{{order}} · {{q}}"
+    fields:
+      - {
+          name: id,
+          label: 代號 (id),
+          widget: string,
+          hint: "唯一代號，例如 f4；不可重複，會成為檔名",
+        }
+      - {
+          name: order,
+          label: 顯示順序（小的排前面）,
+          widget: number,
+          value_type: int,
+          min: 0,
+        }
+      - { name: q, label: 問題, widget: string }
+      - { name: a, label: 回答, widget: text }

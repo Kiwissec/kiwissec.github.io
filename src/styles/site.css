@@ -605,6 +605,87 @@ a {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ---------- News dialog（站內彈出卡） ---------- */
+.news {
+  cursor: pointer;
+}
+.news-link {
+  /* 標題從外連 <a> 改為開啟彈出卡的 <button>：重設按鈕外觀、沿用連結樣式 */
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.news-dialog {
+  border: 0;
+  border-radius: 16px;
+  padding: 0;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  box-shadow: var(--shadow-card-hover);
+}
+.news-dialog::backdrop {
+  background: rgba(43, 30, 22, 0.45);
+}
+.news-dialog-inner {
+  position: relative;
+}
+.news-dialog-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-circle);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brown-600);
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+.news-dialog-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--cream-100);
+}
+.news-dialog-body {
+  padding: 18px 22px 22px;
+}
+/* 卡片上的 .news h3 / .news p 有 line-clamp，彈出卡內要完整顯示需覆寫
+   （同 specificity、順序在後，故生效） */
+.news-dialog h3 {
+  display: block;
+  overflow: visible;
+  font-size: 1.15rem;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+.news-dialog p {
+  display: block;
+  overflow: visible;
+  white-space: pre-line; /* desc 內的換行（CMS 多行文字）原樣呈現 */
+}
+.news-dialog-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--brown-600);
+  text-decoration: none;
+}
+.news-dialog-src:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .center {
   text-align: center;
   margin-top: 40px;
@@ -1020,9 +1101,12 @@ a {
   --cat-color: var(--kiwi-600);
   --cat-badge: #5e7a1e;
 }
+/* offensive 用品牌色票外的陶土鏽紅：原 brown-600 與 defensive 的 taupe 同色相
+   只差深淺（badge 間 dE2000 僅 4.33，實質同色），紅隊語義的鏽紅把最接近的
+   色對拉開到 dE2000 17.7+，且對白底 5.35:1、白字 6.77:1 皆過 WCAG 門檻。 */
 .cat-offensive {
-  --cat-color: var(--brown-600);
-  --cat-badge: #664f40;
+  --cat-color: #b34a26;
+  --cat-badge: #9c3d1e;
 }
 .cat-defensive {
   --cat-color: var(--taupe-500);
@@ -1042,6 +1126,10 @@ a {
   background: var(--cat-badge, var(--taupe-700));
   padding: 4px 11px;
   border-radius: 7px;
+}
+.course-cat i {
+  margin-right: 5px;
+  font-size: 0.9em;
 }
 .course-hours {
   display: inline-flex;

@@ -5,11 +5,10 @@
 // safety nets do and don't catch:
 //
 //   - `astro build` (Zod) validates field types/enums but is BLIND to all
-//     three issues below.
-//   - The e2e suite pins each collection's total count (courses 26, services 4,
-//     testimonials 6, news 6), so it INDIRECTLY catches a dropped/overwritten
-//     row — but only as a count mismatch ("expected 26, received 25"), not a
-//     precise diagnosis, and only while those counts stay maintained.
+//     the issues below.
+//   - The e2e suite derives each collection's expected count from the same
+//     JSON (tests/smoke.spec.ts), so it INDIRECTLY catches a dropped/
+//     overwritten row — but only as a count mismatch, not a precise diagnosis.
 //   - Duplicate `order` and a missing / non-file `news.img` change no count and
 //     produce no build error, so NEITHER build nor e2e catches them at all.
 //
@@ -19,14 +18,23 @@
 //      count-independent diagnosis instead of a vague count drift.
 //   2. `order` unique (ordered collections) — equal order => unstable sort,
 //      counts unchanged => invisible to build and e2e.
-//   3. `news.img` is a real FILE under public/assets/news/ — public/ is copied
-//      verbatim, so a missing file (or a same-named directory) renders a broken
-//      <img> with no build error. Uses statSync().isFile() — existsSync() alone
-//      would pass a directory.
+//   3. `news.img` is a real FILE under public/assets/news/ AND real WebP
+//      (.webp extension + RIFF/WEBP magic bytes) — public/ is copied verbatim,
+//      so a missing file (or a same-named directory) renders a broken <img>
+//      with no build error. The CMS auto-converts supported uploads
+//      (JPG/PNG/GIF/AVIF) to WebP, but HEIC/BMP/TIFF pass through unchanged
+//      and a direct push to the branch bypasses the CMS entirely — this check
+//      is what makes "news images are WebP" an enforced invariant rather than
+//      a hope. Magic bytes catch a renamed non-WebP file the extension check
+//      would trust.
 //   4. every DECLARED category (COURSE_CAT_IDS in src/data/course-cats.ts) has a
 //      `.cat-<id>` rule in src/styles/site.css — the taxonomy is single-sourced
 //      but the per-category colour rule can't be generated from it; a missing
 //      rule renders uncoloured cards silently.
+//   5. no collection is empty — deleting the last entry in the CMS removes the
+//      whole directory from the checkout; the build still exits 0 and renders a
+//      hollow section (the sync script's rollout check only guards NEW
+//      collections, and only at sync time).
 //
 // Dependency-free (node: builtins only). Collects every violation, then exits
 // 1 if any were found. Wired into CI before the build (fail-fast).
@@ -50,12 +58,33 @@ const isFile = (rel) => {
 const errors = [];
 const fail = (msg) => errors.push(msg);
 
-const collections = {
-  courses: loadCollection("courses"),
-  services: loadCollection("services"),
-  news: loadCollection("news"),
-  testimonials: loadCollection("testimonials"),
+// readdirSync throws when the directory itself is gone (git drops empty dirs,
+// so "CMS deleted the last entry" looks like a missing directory) — report that
+// as a clean audit failure instead of an unhandled exception.
+const loadOrEmpty = (name) => {
+  try {
+    return loadCollection(name);
+  } catch {
+    fail(`[${name}] src/data/${name}/ is missing or unreadable — not seeded?`);
+    return [];
+  }
 };
+
+const collections = {
+  courses: loadOrEmpty("courses"),
+  services: loadOrEmpty("services"),
+  news: loadOrEmpty("news"),
+  testimonials: loadOrEmpty("testimonials"),
+  faq: loadOrEmpty("faq"),
+};
+
+// 5. no collection may be empty (an emptied collection renders a hollow
+//    section with no build error; see header note).
+for (const [name, items] of Object.entries(collections)) {
+  if (items.length === 0) {
+    fail(`[${name}] collection is empty — its section renders hollow`);
+  }
+}
 
 // 1. `id` present + unique (every collection).
 for (const [name, items] of Object.entries(collections)) {
@@ -79,7 +108,7 @@ for (const [name, items] of Object.entries(collections)) {
 }
 
 // 2. `order` present + unique (ordered collections only; news is date-sorted).
-for (const name of ["courses", "services", "testimonials"]) {
+for (const name of ["courses", "services", "testimonials", "faq"]) {
   const seen = new Map();
   for (const item of collections[name]) {
     const order = item?.order;
@@ -113,6 +142,23 @@ for (const item of collections.news) {
   if (!isFile(`public/assets/news/${img}`)) {
     fail(
       `[news] "${item.id}" img "${img}" is not a file under public/assets/news/ — renders a broken image with no build error`,
+    );
+    continue;
+  }
+  if (!/\.webp$/i.test(img)) {
+    fail(
+      `[news] "${item.id}" img "${img}" is not .webp — the CMS auto-converts JPG/PNG/GIF/AVIF uploads, but HEIC/BMP/TIFF (and files pushed straight to the branch) land unchanged; convert the image to WebP and re-upload`,
+    );
+    continue;
+  }
+  const bytes = readFileSync(new URL(`public/assets/news/${img}`, root));
+  if (
+    bytes.length < 12 ||
+    bytes.toString("latin1", 0, 4) !== "RIFF" ||
+    bytes.toString("latin1", 8, 12) !== "WEBP"
+  ) {
+    fail(
+      `[news] "${item.id}" img "${img}" has a .webp name but not WebP bytes (RIFF/WEBP header missing) — re-export it as real WebP`,
     );
   }
 }
@@ -157,5 +203,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  "content audit passed: id present+unique, order unique, news images exist, category CSS present.",
+  "content audit passed: id present+unique, order unique, news images are real WebP, category CSS present, no empty collection.",
 );

@@ -20,21 +20,52 @@ const { item } = Astro.props;
       <span class="news-date">{item.date}</span>
     </div>
     <h3>
-      {
-        item.url ? (
-          <a
-            class="news-link"
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {item.title}
-          </a>
-        ) : (
-          item.title
-        )
-      }
+      <button class="news-link" type="button">{item.title}</button>
     </h3>
     <p>{item.desc}</p>
   </div>
+
+  {/* 彈出卡：完整內容留在站內呈現；原始貼文連結降級為卡內的次要按鈕 */}
+  <dialog class="news-dialog" aria-label={item.title}>
+    <div class="news-dialog-inner">
+      <button
+        class="news-dialog-close"
+        type="button"
+        autofocus
+        aria-label="關閉"
+      >
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+      <img
+        class="news-dialog-img"
+        src={withBase("/assets/news/" + item.img)}
+        alt=""
+        loading="lazy"
+      />
+      <div class="news-dialog-body">
+        <div class="news-meta">
+          <span class="badge">{item.tag}</span>
+          <span class="news-date">{item.date}</span>
+        </div>
+        <h3 class="news-dialog-title">{item.title}</h3>
+        <p class="news-dialog-desc">{item.desc}</p>
+        {
+          item.url && (
+            <a
+              class="news-dialog-src"
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              前往 Facebook 原文
+              <i
+                class="fa-solid fa-arrow-up-right-from-square"
+                aria-hidden="true"
+              />
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </dialog>
 </article>

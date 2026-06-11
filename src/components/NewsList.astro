@@ -22,7 +22,7 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
       <span>/</span> 最新消息
     </nav>
     <h1>最新消息</h1>
-    <p>七維思的活動快訊、課程與社群動態 —— 看看鳥鳥們最近都在忙些什麼。</p>
+    <p>七維思的活動快訊、課程與社群動態 —— 看看奇異鳥們最近都在忙些什麼。</p>
   </div>
 </header>
 
@@ -77,5 +77,26 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
       }),
     );
     render();
+
+    // 彈出卡：原生 <dialog> 提供 ESC、backdrop 與 inert，這裡只補
+    // 開關綁定、backdrop 點擊關閉與關閉後的焦點還原。
+    cards.forEach((card) => {
+      const dialog = card.querySelector<HTMLDialogElement>(".news-dialog");
+      const opener = card.querySelector<HTMLButtonElement>(".news-link");
+      if (!dialog || !opener) return;
+
+      card.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).closest("dialog")) return;
+        if (!dialog.open) dialog.showModal();
+      });
+      dialog.addEventListener("click", (e) => {
+        // 內容包在 .news-dialog-inner；事件目標是 dialog 本身即點到 backdrop
+        if (e.target === dialog) dialog.close();
+      });
+      dialog
+        .querySelector(".news-dialog-close")
+        ?.addEventListener("click", () => dialog.close());
+      dialog.addEventListener("close", () => opener.focus());
+    });
   }
 </script>

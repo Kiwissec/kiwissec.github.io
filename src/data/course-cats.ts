@@ -3,8 +3,9 @@
 // Consumed by:
 //   - src/content.config.ts  → the `courses.cat` Zod enum
 //   - src/data/site.ts       → `courseCats` (prepends the synthetic "all")
-//   - src/components/CoursesCatalog.astro (client island) → `VALID` whitelist
+//   - src/components/CoursesCatalog.astro → `VALID` whitelist + badge icons
 //   - src/components/CoursesTeaser.astro → category cards (label / icon / blurb)
+//   - src/pages/courses/[id].astro → detail-page badge icon
 //
 // Adding a category here updates all of the above at once. The ONE thing it
 // cannot generate is the per-category colour rule `.cat-<id>` in
@@ -17,7 +18,7 @@ export type CourseCatId = (typeof COURSE_CAT_IDS)[number];
 
 export interface CourseCatMeta {
   label: string;
-  icon: string; // Font Awesome class for the teaser card
+  icon: string; // Font Awesome class（首頁 teaser 卡 + 課程卡/內頁 badge）
   blurb: string; // teaser card one-liner
 }
 

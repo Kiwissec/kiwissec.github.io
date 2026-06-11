@@ -1,7 +1,7 @@
 name: Sync content to main
 
 # Keep the long-lived `content` branch (where the CMS commits partner edits)
-# aligned with `main`, so editors always start from the latest code + content.
+# aligned with `main`, so editors start from the latest code + content.
 # Runs after every push to `main` (PR merges, engineer syncs) and fast-forwards
 # `content` up to `main` — but ONLY when `content` has no un-merged commits of
 # its own. If a partner edit is still pending its content -> main PR, this leaves

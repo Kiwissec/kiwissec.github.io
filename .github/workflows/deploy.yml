@@ -27,7 +27,10 @@ jobs:
       - name: Build with Astro
         uses: withastro/action@v6
         with:
-          node-version: 24
+          # 與 mise.toml / ci.yml 的 exact pin 對齊（出貨產物用被測過的同一
+          # 版本建置）。本檔不在 sync allowlist：bump Node 時需手動同步三處
+          # （mise.toml、ci.yml、本檔）。
+          node-version: 24.15.0
 
   deploy:
     needs: build

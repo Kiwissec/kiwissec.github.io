@@ -50,7 +50,7 @@ jobs:
         # 失敗時沒有 artifact 就只剩純文字 log；html 報告含 retry 錄到的
         # trace。!cancelled() 確保失敗也上傳（Playwright 官方 CI 建議）。
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: playwright-report/

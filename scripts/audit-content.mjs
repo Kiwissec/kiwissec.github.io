@@ -13,9 +13,11 @@
 //     produce no build error, so NEITHER build nor e2e catches them at all.
 //
 // Checks (all hard-fail):
-//   1. `id` present + unique — file() SILENTLY DROPS an id-less row (build
-//      exits 0) and only WARNs on a duplicate id (last wins). Gives a precise,
-//      count-independent diagnosis instead of a vague count drift.
+//   1. `id` equals its filename (sans .json) — routes derive from the FILENAME
+//      (the glob loader's generateId) while links and the e2e tests read the
+//      `id` FIELD, so a drift 404s /courses/<id>/ in e2e with a confusing
+//      message. Equality also implies id presence and uniqueness (filenames
+//      are unique), which Zod's per-file validation can't see across files.
 //   2. `order` unique (ordered collections) — equal order => unstable sort,
 //      counts unchanged => invisible to build and e2e.
 //   3. `news.img` is a real FILE under public/assets/news/ AND real WebP
@@ -35,12 +37,17 @@
 //      whole directory from the checkout; the build still exits 0 and renders a
 //      hollow section (the sync script's rollout check only guards NEW
 //      collections, and only at sync time).
+//   6. news `tag` is not the show-all sentinel「全部」— NewsList builds its
+//      filter tabs as ["全部", ...tags] and treats 全部 as "show everything",
+//      so a real tag named 全部 renders a second conflicting button that can
+//      never narrow the list; the tag field is free text in the CMS, so this
+//      is the only place the collision can be caught with a clear message.
 //
 // Dependency-free (node: builtins only). Collects every violation, then exits
 // 1 if any were found. Wired into CI before the build (fail-fast).
 
 import { readFileSync, statSync } from "node:fs";
-import { loadCollection } from "../src/data/_loadCollection.js";
+import { loadCollectionEntries } from "../src/data/_loadCollection.js";
 
 // Repo root, anchored to this script's location (scripts/), not the cwd.
 const root = new URL("../", import.meta.url);
@@ -60,51 +67,58 @@ const fail = (msg) => errors.push(msg);
 
 // readdirSync throws when the directory itself is gone (git drops empty dirs,
 // so "CMS deleted the last entry" looks like a missing directory) — report that
-// as a clean audit failure instead of an unhandled exception.
+// as a clean audit failure instead of an unhandled exception. Other errors
+// (e.g. malformed JSON) carry the failing file in their message and must NOT
+// be misreported as a seeding problem.
 const loadOrEmpty = (name) => {
   try {
-    return loadCollection(name);
-  } catch {
-    fail(`[${name}] src/data/${name}/ is missing or unreadable — not seeded?`);
-    return [];
+    return loadCollectionEntries(name);
+  } catch (err) {
+    fail(
+      err?.code === "ENOENT"
+        ? `[${name}] src/data/${name}/ is missing or unreadable — not seeded?`
+        : `[${name}] ${err.message}`,
+    );
+    // null（而非 []）標記「載入失敗、已報錯」：避免檢查 5 對其實有檔案
+    // 的 collection 疊加一條誤導的 empty 訊息。
+    return null;
   }
 };
 
-const collections = {
+// entries 保留檔名供檢查 1；其餘檢查只需要資料本身。
+const collectionEntries = {
   courses: loadOrEmpty("courses"),
   services: loadOrEmpty("services"),
   news: loadOrEmpty("news"),
   testimonials: loadOrEmpty("testimonials"),
   faq: loadOrEmpty("faq"),
 };
+const collections = Object.fromEntries(
+  Object.entries(collectionEntries).map(([name, entries]) => [
+    name,
+    (entries ?? []).map((e) => e.data),
+  ]),
+);
 
 // 5. no collection may be empty (an emptied collection renders a hollow
-//    section with no build error; see header note).
-for (const [name, items] of Object.entries(collections)) {
-  if (items.length === 0) {
+//    section with no build error; see header note). Skips collections that
+//    already failed to load (null) — they have a precise error already.
+for (const [name, entries] of Object.entries(collectionEntries)) {
+  if (entries && entries.length === 0) {
     fail(`[${name}] collection is empty — its section renders hollow`);
   }
 }
 
-// 1. `id` present + unique (every collection).
-for (const [name, items] of Object.entries(collections)) {
-  const seen = new Map();
-  items.forEach((item, i) => {
-    const id = item?.id;
-    if (typeof id !== "string" || id.trim() === "") {
+// 1. `id` equals its filename (every collection; see header note 1).
+for (const [name, entries] of Object.entries(collectionEntries)) {
+  for (const { file, data } of entries ?? []) {
+    const expected = file.replace(/\.json$/, "");
+    if (data?.id !== expected) {
       fail(
-        `[${name}] item #${i} has no valid "id" — file() would silently drop it`,
+        `[${name}] ${file}: id "${data?.id ?? "(missing)"}" must equal the filename "${expected}" — routes use the filename, links and tests use the id`,
       );
-      return;
     }
-    if (seen.has(id)) {
-      fail(
-        `[${name}] duplicate id "${id}" (#${seen.get(id)} and #${i}) — later overwrites earlier`,
-      );
-    } else {
-      seen.set(id, i);
-    }
-  });
+  }
 }
 
 // 2. `order` present + unique (ordered collections only; news is date-sorted).
@@ -163,6 +177,16 @@ for (const item of collections.news) {
   }
 }
 
+// 6. news `tag` must not collide with the show-all sentinel (see header
+//    note 6).
+for (const item of collections.news) {
+  if (item?.tag === "全部") {
+    fail(
+      `[news] "${item.id}" uses the reserved tag "全部" — that label is the show-all filter; pick another tag`,
+    );
+  }
+}
+
 // 4. every DECLARED course category has a `.cat-<id>` colour rule in site.css.
 //    The taxonomy is single-sourced in src/data/course-cats.ts and everything
 //    else (Zod enum, courseCats, the island VALID, teaser icon/blurb) is derived
@@ -203,5 +227,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  "content audit passed: id present+unique, order unique, news images are real WebP, category CSS present, no empty collection.",
+  "content audit passed: id matches filename, order unique, news images are real WebP, news tags valid, category CSS present, no empty collection.",
 );

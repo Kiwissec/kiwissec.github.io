@@ -168,7 +168,12 @@ collections:
               name: href,
               label: 連結,
               widget: string,
-              hint: "站內用 /courses，外部用完整網址",
+              pattern:
+                [
+                  '^(/(?![/\\])|#|https?://)',
+                  "站內路徑用 / 開頭，外部連結用 https:// 開頭",
+                ],
+              hint: "站內用 /courses，外部用完整網址（https:// 開頭）",
             }
           - {
               name: primary,
@@ -203,7 +208,12 @@ collections:
           widget: string,
           hint: "建議用該則日期，例如 2026-01-31；不可重複，會成為檔名",
         }
-      - { name: tag, label: 標籤（會變成可篩選分類）, widget: string }
+      - {
+          name: tag,
+          label: 標籤（會變成可篩選分類）,
+          widget: string,
+          hint: "不要取名「全部」（保留給「顯示全部」的篩選鈕）",
+        }
       - name: date
         label: 日期
         widget: datetime
@@ -225,6 +235,8 @@ collections:
           label: 連結網址,
           widget: string,
           required: false,
+          # pattern 字串結尾不可是 /（Sveltia 會當成 regex 結束分隔符吃掉）
+          pattern: ["^https?://.+", "請輸入完整網址（https:// 開頭）"],
           hint: "原始貼文網址（例如該則 Facebook 貼文）。點擊卡片會開啟站內彈出卡顯示完整內容；有填網址時彈出卡內會多一個「前往 Facebook 原文」按鈕，留空則只顯示站內內容",
         }
 

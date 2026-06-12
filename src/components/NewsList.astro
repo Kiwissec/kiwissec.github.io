@@ -28,14 +28,17 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
 
 <section class="section section-flush" id="all-news">
   <div class="wrap">
-    <div class="course-tabs" role="tablist" aria-label="消息分類">
+    {
+      /* 篩選器語意（toggle button + aria-pressed），非 ARIA tabs：理由同
+        CoursesCatalog。 */
+    }
+    <div class="course-tabs" role="group" aria-label="消息分類">
       {
         tags.map((t, i) => (
           <button
             class={"course-tab" + (i === 0 ? " is-active" : "")}
-            role="tab"
             data-tag={t}
-            aria-selected={i === 0 ? "true" : "false"}
+            aria-pressed={i === 0 ? "true" : "false"}
           >
             {t}
             {t !== "全部" && <span class="tab-count">{count(t)}</span>}
@@ -66,7 +69,7 @@ const count = (t: string) => news.filter((n) => n.data.tag === t).length;
       tabs.forEach((t) => {
         const on = t.dataset.tag === active;
         t.classList.toggle("is-active", on);
-        t.setAttribute("aria-selected", String(on));
+        t.setAttribute("aria-pressed", String(on));
       });
     };
 

@@ -1,0 +1,14 @@
+# 依賴更新自動化（CLAUDE.md 資安要求「定期檢查已知漏洞」的機制面）。
+# npm：週期檢查 package.json / lock 的更新與 security advisory；
+# github-actions：跟進 workflow 引用的 action 新版（本 repo 以官方 action
+# 的 major tag 釘選——Dependabot 讓 tag 引用持續跟上）。
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

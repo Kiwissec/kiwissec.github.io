@@ -32,7 +32,7 @@ const orgLd = {
   url: Astro.site ? Astro.site.href : canonical,
   logo: absoluteUrl("/assets/logos/lockup-stacked-hat-gold.png", Astro.site),
   email: footer.email,
-  telephone: "+886-2-2312-0400",
+  telephone: footer.phoneTel,
   address: {
     "@type": "PostalAddress",
     addressCountry: "TW",
@@ -92,6 +92,7 @@ const orgLd = {
     <slot name="head" />
   </head>
   <body>
+    <a class="skip-link" href="#main">跳至主要內容</a>
     <slot />
   </body>
 </html>

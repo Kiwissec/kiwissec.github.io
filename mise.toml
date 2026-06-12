@@ -1,4 +1,8 @@
 # Astro 以 Node 為 runtime。釘選具體 LTS 版本（exact pin）作為環境 single source
 # of truth；Node 24 LTS patch 更新時手動 bump（需自動跟進 patch 可改為 "24"）。
+# pre-commit 同樣由 mise 釘選（CLAUDE.md：開發工具透過 mise 管理）——
+# 否則 README 的 `pre-commit run --all-files` 對照 quick-start 走完仍是
+# command not found。
 [tools]
 node = "24.15.0"
+pre-commit = "4.5.1"

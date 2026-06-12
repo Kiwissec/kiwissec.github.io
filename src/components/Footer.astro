@@ -1,7 +1,7 @@
 ---
 import { footer, company } from "../data/site";
 import { withBase } from "../lib/site";
-const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
+const telHref = "tel:" + footer.phoneTel.replace(/[^0-9+]/g, "");
 ---
 
 <footer class="footer">
@@ -65,13 +65,8 @@ const telHref = "tel:" + footer.phone.replace(/[^0-9+]/g, "");
         <span class="footer-follow">追蹤我們</span>
         <div class="socials">
           {
-            footer.socials.map(([icon, href]) => (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener"
-                aria-label={icon.replace("fa-", "")}
-              >
+            footer.socials.map(([icon, href, label]) => (
+              <a href={href} target="_blank" rel="noopener" aria-label={label}>
                 <i class={"fa-brands " + icon} aria-hidden="true" />
               </a>
             ))

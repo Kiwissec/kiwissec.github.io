@@ -11,7 +11,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: "list",
+  // CI 另產 html 報告（含 retry 的 trace），由 ci.yml 上傳為 artifact 供
+  // 失敗除錯；本機維持精簡的 list 輸出。
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { baseURL: BASE, trace: "on-first-retry" },
   projects: [
     {

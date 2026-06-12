@@ -5,14 +5,29 @@ import { test, expect } from "@playwright/test";
 // still assert the rendered count MATCHES the data and that filters behave —
 // only the magic numbers are gone.
 import { loadCollection } from "../src/data/_loadCollection.js";
-import { resources } from "../src/data/site";
+import { footer, resources } from "../src/data/site";
 import { COURSE_CAT_IDS, COURSE_CAT_META } from "../src/data/course-cats";
 
-const courses = loadCollection("courses");
-const news = loadCollection("news");
-const services = loadCollection("services");
-const testimonials = loadCollection("testimonials");
-const faq = loadCollection("faq");
+// 在收集測試的 module scope 載入：collection 缺失或為空時，原始
+// ENOENT / undefined 取值會讓整個 suite 以無指引的 stack trace 崩潰；
+// 改丟可行動的訊息（audit:content 能給精確診斷）。
+const loadOrExplain = (name: string) => {
+  try {
+    const items = loadCollection(name);
+    if (items.length === 0) throw new Error(`collection "${name}" is empty`);
+    return items;
+  } catch (err) {
+    throw new Error(
+      `cannot load content collection "${name}" — run \`npm run audit:content\` for a precise diagnosis (${(err as Error).message})`,
+    );
+  }
+};
+
+const courses = loadOrExplain("courses");
+const news = loadOrExplain("news");
+const services = loadOrExplain("services");
+const testimonials = loadOrExplain("testimonials");
+const faq = loadOrExplain("faq");
 
 const coursesInCat = (cat: string) =>
   courses.filter((c) => c.cat === cat).length;
@@ -78,6 +93,7 @@ test.describe("every page loads cleanly", () => {
       const resp = await page.goto(route);
       expect(resp?.status()).toBe(200);
       await expect(page.locator(".nav-brand")).toBeVisible();
+      await expect(page.locator("main#main")).toHaveCount(1);
       await expect(page.locator("footer.footer")).toBeVisible();
       expect(errors, errors.join("\n")).toEqual([]);
     });
@@ -126,6 +142,7 @@ test("unknown routes get the branded 404 page", async ({ page }) => {
   const resp = await page.goto("/no-such-page/");
   expect(resp?.status()).toBe(404);
   await expect(page.locator(".nav-brand")).toBeVisible();
+  await expect(page.locator("main#main")).toHaveCount(1);
   await expect(page.locator("h1")).toContainText("找不到頁面");
   await expect(page.locator("footer.footer")).toBeVisible();
   // The 404 content renders at arbitrary URLs (and /404.html answers 200), so
@@ -167,6 +184,32 @@ test.describe("canonical and og:url name the final trailing-slash URL", () => {
         .getAttribute("content");
       expect(ogUrl).toBe(canonical);
     });
+  }
+});
+
+test("the footer tel link dials the international (E.164) number", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const telLink = page.locator('footer.footer a[href^="tel:"]');
+  // independent invariant: an international number, not a data-plumbing echo
+  // (the data-derived check below uses the same transform as Footer.astro and
+  // would silently follow a regression of phoneTel back to the local format)
+  await expect(telLink).toHaveAttribute("href", /^tel:\+\d+$/);
+  const expected = "tel:" + footer.phoneTel.replace(/[^0-9+]/g, "");
+  await expect(telLink).toHaveAttribute("href", expected);
+});
+
+test("footer social links carry human-readable accessible names", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const links = page.locator("footer.footer .socials a");
+  await expect(links).toHaveCount(footer.socials.length);
+  for (const [, href, label] of footer.socials) {
+    await expect(
+      page.locator(`footer.footer .socials a[href="${href}"]`),
+    ).toHaveAttribute("aria-label", label);
   }
 });
 
@@ -213,11 +256,22 @@ test("courses: category filter, search and ?cat= deep-link", async ({
   await expect(page.locator(".course-card:visible")).toHaveCount(
     coursesInCat(FILTER_CAT),
   );
+  // filter buttons expose toggle semantics (aria-pressed tracks the choice)
+  await expect(
+    page.locator(`.course-tab[data-cat="${FILTER_CAT}"]`),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('.course-tab[data-cat="all"]')).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
   await expect(
     page.locator(".course-card:visible .course-cat i").first(),
   ).toHaveClass(COURSE_CAT_META[FILTER_CAT].icon);
+  // the chosen category survives a reload / share (URL carries ?cat=)
+  await expect(page).toHaveURL(new RegExp(`\\?cat=${FILTER_CAT}$`));
 
   await page.click('.course-tab[data-cat="all"]');
+  await expect(page).not.toHaveURL(/cat=/);
   await page.fill(".course-search-input", SEARCH_TERM);
   await expect(page.locator(".course-card:visible")).toHaveCount(searchHits);
 
@@ -249,6 +303,18 @@ test("faq accordion keeps a single panel open", async ({ page }) => {
   await expect(page.locator(".faq-item").nth(last)).toHaveClass(/open/);
 });
 
+test.describe("faq stays readable without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("the default-open answer is visible with JS disabled", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(
+      page.locator(".faq-item.open .faq-a-inner").first(),
+    ).toBeVisible();
+  });
+});
+
 test("mobile navigation opens the offcanvas menu", async ({
   page,
   isMobile,
@@ -268,6 +334,43 @@ test("mobile navigation opens the offcanvas menu", async ({
   await top.click();
   await expect(top).toHaveAttribute("aria-expanded", "true");
   await expect(group.locator(".nav-dropdown")).toBeVisible();
+});
+
+test.describe("main content does not skip heading levels", () => {
+  for (const route of [
+    "/",
+    "/services/",
+    "/courses/",
+    "/news/",
+    `/courses/${courses[0].id}/`,
+  ]) {
+    test(`${route} heading outline increments by at most one`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+      const levels = await page
+        .locator("main h1, main h2, main h3, main h4, main h5, main h6")
+        .evaluateAll((els) => els.map((el) => Number(el.tagName[1])));
+      expect(levels[0]).toBe(1);
+      let prev = 1;
+      for (const level of levels) {
+        expect(level, `h${level} after h${prev}`).toBeLessThanOrEqual(prev + 1);
+        prev = level;
+      }
+    });
+  }
+});
+
+test("the skip link is the first focusable element and targets main", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  const skip = page.locator(".skip-link");
+  await expect(skip).toBeFocused();
+  await expect(skip).toBeVisible();
+  await expect(skip).toHaveAttribute("href", "#main");
+  await expect(page.locator("main#main")).toHaveCount(1);
 });
 
 test("aria-current marks only the real current page", async ({ page }) => {
@@ -296,6 +399,23 @@ test("news cards open an on-page dialog with the full story", async ({
   await card.locator(".news-link").click();
   await expect(dialog).toBeVisible();
   await expect(dialog.locator(".news-dialog-title")).toHaveText(cardTitle);
+
+  // the dialog must not inherit the card's line-clamp (innerText can't see
+  // visual truncation, so assert the computed style directly)
+  for (const sel of [".news-dialog-title", ".news-dialog-desc"]) {
+    const clamp = await dialog
+      .locator(sel)
+      .evaluate((el) => getComputedStyle(el).webkitLineClamp);
+    expect(clamp, `${sel} should not be line-clamped`).toBe("none");
+  }
+  // the UA gives dialog { color: CanvasText } — the brand color must be
+  // declared on the dialog title itself, not inherited from card rules
+  const titleColor = await dialog
+    .locator(".news-dialog-title")
+    .evaluate((el) => getComputedStyle(el).color);
+  expect(titleColor, "dialog title keeps the brand brown").toBe(
+    "rgb(102, 79, 64)",
+  );
 
   // close button restores focus to the opener
   await dialog.locator(".news-dialog-close").click();

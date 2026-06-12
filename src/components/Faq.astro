@@ -51,8 +51,12 @@ const faq = (await getCollection("faq")).sort(
   });
 
   // Re-measure the open panel on resize (wrapping can change its height).
-  window.addEventListener("resize", () => {
+  const remeasure = () => {
     const open = items.find((i) => i.classList.contains("open"));
     if (open) setOpen(open, true);
-  });
+  };
+  window.addEventListener("resize", remeasure);
+  // CJK webfont 晚於初次量測載入時換行數會變，px 高度會裁掉尾行：
+  // 字型就緒後重量一次。
+  document.fonts.ready.then(remeasure);
 </script>

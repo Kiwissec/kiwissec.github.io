@@ -55,13 +55,21 @@
 }
 
 /* 3. Open Huninn — rounded CJK fallback / long-form reading alt.
-   Pinned to the v1.1 release (same file the site has always served). */
+   Pinned to the v1.1 release (same file the site has always served).
+   unicode-range 限定在 CJK 區段：這是 7.3MB 的單一未切片 TTF，未限定時
+   任何 Maple 字型不涵蓋的字元（如 CMS 內容中的 emoji）都會觸發整包下載，
+   而 emoji 本就不是它服務的範圍（交給系統字型）。CJK 文字的 fallback
+   行為不變。 */
 @font-face {
   font-family: "Open Huninn";
   src: url(https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@v1.1/font/jf-openhuninn-1.1.ttf)
     format("truetype");
   font-display: swap;
   font-weight: 400 700;
+  unicode-range:
+    U+2E80-2EFF, U+3000-30FF, U+3105-312F, U+31A0-31BF, U+31C0-31EF,
+    U+31F0-31FF, U+3200-32FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF,
+    U+FE30-FE4F, U+FF00-FFEF;
 }
 
 :root {

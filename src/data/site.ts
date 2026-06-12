@@ -1,6 +1,8 @@
 // Kiwissec website — stable site singletons & fixed UI copy (nav, hero, about,
 // contact, footer, resources, company). Dynamic collections (courses, services,
-// news, testimonials, faq) live in src/data/*.json; see content.config.ts.
+// news, testimonials, faq) live one-file-per-entry in src/data/<collection>/
+// — in production they are edited via the PUBLIC repo's Sveltia CMS, this
+// repo's copies are dev seeds only; see content.config.ts and the README.
 // Ported from the design bundle's ui_kits/website/data.js.
 // Sources: old-website (archived) + kiwissec.com (參考，2026-06 擷取整理；
 // 內容可能已改版，上線前以公司最新資訊為準). Internal hrefs use Astro
@@ -177,15 +179,19 @@ export const footer = {
   ] as [string, string][],
   email: "contact@kiwissec.com",
   phone: "02-2312 0400",
+  // tel: 連結與 JSON-LD 用的國際格式（RFC 3966 建議含國碼，海外才撥得通）；
+  // phone 維持本地慣用的顯示格式。
+  phoneTel: "+886-2-2312-0400",
   addr: "臺北市中山區復興北路48號7樓",
   tax: "統一編號：90286907",
+  // [icon, href, 朗讀用名稱]：aria-label 用人話而非 icon class 名。
   socials: [
-    ["fa-facebook-f", "https://www.facebook.com/KiwisSec"],
-    ["fa-instagram", "https://www.instagram.com/kiwissec"],
-    ["fa-discord", "https://discord.gg/7MXDAGUp4P"],
-    ["fa-youtube", "https://www.youtube.com/@KiwisSec"],
-    ["fa-x-twitter", "https://twitter.com/KiwisSec"],
-  ] as [string, string][],
+    ["fa-facebook-f", "https://www.facebook.com/KiwisSec", "Facebook"],
+    ["fa-instagram", "https://www.instagram.com/kiwissec", "Instagram"],
+    ["fa-discord", "https://discord.gg/7MXDAGUp4P", "Discord"],
+    ["fa-youtube", "https://www.youtube.com/@KiwisSec", "YouTube"],
+    ["fa-x-twitter", "https://twitter.com/KiwisSec", "X（Twitter）"],
+  ] as [string, string, string][],
 };
 
 export const company = {

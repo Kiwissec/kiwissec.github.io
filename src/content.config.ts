@@ -3,10 +3,12 @@ import { z } from "astro/zod";
 import { glob } from "astro/loaders";
 import { COURSE_CAT_IDS } from "./data/course-cats";
 
-// 常變動內容（課程 / 服務 / 消息 / 見證 / 常見問題）以 src/data/*.json 維護，透過
-// Astro Content Collections 在 build 時以 Zod schema 驗證（schema 不符會讓 astro
-// build 失敗），與呈現分離、利於日後 CMS 編輯。穩定的單例與分類（nav/hero/footer/
-// courseCats…）仍留在 src/data/site.ts。
+// 常變動內容（課程 / 服務 / 消息 / 見證 / 常見問題）以 src/data/<collection>/*.json
+// 每筆一檔維護，透過 Astro Content Collections 在 build 時以 Zod schema 驗證
+//（schema 不符會讓 astro build 失敗）。線上內容由 public repo（kiwissec.github.io）
+// 的 Sveltia CMS 維護——本 repo 的 JSON 僅為 dev 種子、會落後線上；想在這裡改
+// 線上內容是常見誤區，雙 repo 分工見 README「部署與雙 repo」。穩定的單例與分類
+//（nav/hero/footer/courseCats…）留在 src/data/site.ts。
 //
 // getCollection() 不保證順序，故消費端一律自行排序：courses/services/
 // testimonials/faq 依 `order`、news 依 `date` 由新到舊。
@@ -14,12 +16,29 @@ import { COURSE_CAT_IDS } from "./data/course-cats";
 // 課程資料對齊七維思官方《資訊與資安課程型錄 v20260503》。
 // 課程分類字彙的單一來源為 src/data/course-cats.ts。
 
-const courses = defineCollection({
-  loader: glob({
+// CMS 可編輯的連結欄位值會原樣渲染進 <a href>，故在 schema 邊界擋掉
+// javascript: / data: 等可執行 scheme：僅接受站內路徑（/ 或 # 開頭）
+// 或 http(s) 絕對網址。站內路徑禁止第二個 / 或 \：// 與 /\ 會被瀏覽器
+// 解析成 protocol-relative 外站網址，不是站內路徑。
+const safeHref = z
+  .string()
+  .refine(
+    (v) =>
+      /^\/(?![/\\])/.test(v) || v.startsWith("#") || /^https?:\/\//.test(v),
+    { message: "href 僅接受站內路徑（/ 或 # 開頭）或 http(s):// 網址" },
+  );
+
+// 五個 collection 的 loader 設定除目錄名外完全相同（per-file JSON、
+// entry id 取檔名）；變更理由相同，集中一處。
+const jsonLoader = (name: string) =>
+  glob({
     pattern: "**/*.json",
-    base: "./src/data/courses",
+    base: `./src/data/${name}`,
     generateId: ({ entry }) => entry.replace(/\.json$/, ""),
-  }),
+  });
+
+const courses = defineCollection({
+  loader: jsonLoader("courses"),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),
@@ -39,11 +58,7 @@ const courses = defineCollection({
 });
 
 const services = defineCollection({
-  loader: glob({
-    pattern: "**/*.json",
-    base: "./src/data/services",
-    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
-  }),
+  loader: jsonLoader("services"),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),
@@ -56,7 +71,7 @@ const services = defineCollection({
       .array(
         z.object({
           label: z.string(),
-          href: z.string(),
+          href: safeHref,
           primary: z.boolean().optional(),
           external: z.boolean().optional(),
         }),
@@ -66,11 +81,7 @@ const services = defineCollection({
 });
 
 const news = defineCollection({
-  loader: glob({
-    pattern: "**/*.json",
-    base: "./src/data/news",
-    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
-  }),
+  loader: jsonLoader("news"),
   schema: z.object({
     id: z.string(),
     tag: z.string(),
@@ -81,17 +92,14 @@ const news = defineCollection({
     title: z.string(),
     desc: z.string(),
     // 連往原始貼文（例如 Facebook）；optional 以漸進增強——留空時 NewsCard
-    // 維持純展示卡片，不破壞既有資料。
-    url: z.url().optional(),
+    // 維持純展示卡片，不破壞既有資料。限定 http(s)：裸 z.url() 會接受
+    // javascript: 等可執行 scheme，而此值原樣渲染進 <a href>。
+    url: z.url({ protocol: /^https?$/ }).optional(),
   }),
 });
 
 const testimonials = defineCollection({
-  loader: glob({
-    pattern: "**/*.json",
-    base: "./src/data/testimonials",
-    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
-  }),
+  loader: jsonLoader("testimonials"),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),
@@ -102,11 +110,7 @@ const testimonials = defineCollection({
 });
 
 const faq = defineCollection({
-  loader: glob({
-    pattern: "**/*.json",
-    base: "./src/data/faq",
-    generateId: ({ entry }) => entry.replace(/\.json$/, ""),
-  }),
+  loader: jsonLoader("faq"),
   schema: z.object({
     id: z.string(),
     order: z.number().int().nonnegative(),

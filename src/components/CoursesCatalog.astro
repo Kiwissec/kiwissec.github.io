@@ -53,14 +53,17 @@ const searchText = (c: CollectionEntry<"courses">) =>
       </button>
     </div>
 
-    <div class="course-tabs" role="tablist" aria-label="課程分類">
+    {
+      /* 篩選器語意（toggle button + aria-pressed），非 ARIA tabs：tabs 模式
+        要求 tabpanel 與方向鍵 roving tabindex，篩選鈕不適用（APG tabs）。 */
+    }
+    <div class="course-tabs" role="group" aria-label="課程分類">
       {
         courseCats.map((c) => (
           <button
             class={"course-tab" + (c.id === "all" ? " is-active" : "")}
-            role="tab"
             data-cat={c.id}
-            aria-selected={c.id === "all" ? "true" : "false"}
+            aria-pressed={c.id === "all" ? "true" : "false"}
           >
             {c.label}
             {c.id !== "all" && (
@@ -97,7 +100,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
                 {c.data.hours}
               </span>
             </div>
-            <h3 class="course-title">{c.data.title}</h3>
+            <h2 class="course-title">{c.data.title}</h2>
             <p class="course-desc">{c.data.desc}</p>
             <div class="course-tags">
               {c.data.tags.map((t) => (
@@ -154,6 +157,15 @@ const searchText = (c: CollectionEntry<"courses">) =>
     let active = VALID.includes(fromUrl) ? fromUrl : "all";
     let raw = "";
 
+    // 切換分類時同步 ?cat=，重新整理或分享連結才不會回到舊選擇；
+    // 用 replaceState（同一頁的檢視狀態，不堆瀏覽歷史）。
+    const syncUrl = () => {
+      const url = new URL(location.href);
+      if (active === "all") url.searchParams.delete("cat");
+      else url.searchParams.set("cat", active);
+      history.replaceState(null, "", url);
+    };
+
     const render = () => {
       const q = raw.trim().toLowerCase();
       let shown = 0;
@@ -167,7 +179,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
       tabs.forEach((t) => {
         const on = t.dataset.cat === active;
         t.classList.toggle("is-active", on);
-        t.setAttribute("aria-selected", String(on));
+        t.setAttribute("aria-pressed", String(on));
       });
       grid.hidden = shown === 0;
       empty.hidden = shown > 0;
@@ -180,6 +192,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
     tabs.forEach((t) =>
       t.addEventListener("click", () => {
         active = t.dataset.cat || "all";
+        syncUrl();
         render();
       }),
     );
@@ -197,6 +210,7 @@ const searchText = (c: CollectionEntry<"courses">) =>
       active = "all";
       raw = "";
       input.value = "";
+      syncUrl();
       render();
     });
 

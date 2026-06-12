@@ -13,6 +13,23 @@
 [hidden] {
   display: none !important;
 }
+/* 鍵盤使用者的跳轉連結（WCAG 2.4.1）：平時移出視窗，聚焦時浮現於
+   導覽列（z-index 50）與行動版選單（60）之上。 */
+.skip-link {
+  position: fixed;
+  top: -64px;
+  left: 16px;
+  z-index: 70;
+  padding: 10px 16px;
+  background: var(--brown-600);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 10px;
+}
+.skip-link:focus {
+  top: 12px;
+}
 html {
   scroll-behavior: smooth;
 }
@@ -576,7 +593,7 @@ a {
   font-size: 13px;
   color: var(--gray-600);
 }
-.news h3 {
+.news h2 {
   font-size: 1.0625rem;
   font-weight: 700;
   color: var(--brown-600);
@@ -658,18 +675,25 @@ a {
 .news-dialog-body {
   padding: 18px 22px 22px;
 }
-/* 卡片上的 .news h3 / .news p 有 line-clamp，彈出卡內要完整顯示需覆寫
-   （同 specificity、順序在後，故生效） */
-.news-dialog h3 {
+/* 卡片上的 .news h2 / .news p 有 line-clamp，彈出卡內要完整顯示需覆寫。
+   以雙 class（0,2,0）勝過卡片規則（0,1,1），不依賴檔案順序——重排或
+   樣式重構不會讓彈出卡內容被無聲重新截斷。 */
+.news-dialog .news-dialog-title {
   display: block;
   overflow: visible;
+  -webkit-line-clamp: none;
+  /* dialog 不繼承 body 顏色（UA 給 CanvasText），標題的品牌色與字重
+     須在此明確宣告，不能依賴卡片的 .news h2 規則（已不匹配 h3）。 */
+  color: var(--brown-600);
+  font-weight: 700;
   font-size: 1.15rem;
   line-height: 1.45;
   margin: 0 0 10px;
 }
-.news-dialog p {
+.news-dialog .news-dialog-desc {
   display: block;
   overflow: visible;
+  -webkit-line-clamp: none;
   white-space: pre-line; /* desc 內的換行（CMS 多行文字）原樣呈現 */
 }
 .news-dialog-src {
@@ -1521,6 +1545,11 @@ a {
   max-height: 0;
   overflow: hidden;
   transition: max-height var(--dur-base) var(--ease-soft);
+}
+/* 無 JS（或 script 載入失敗）時 server 端標記 open 的項目仍須可讀；
+   有 JS 時 inline max-height（px）優先於此規則，動畫行為不變。 */
+.faq-item.open .faq-a {
+  max-height: none;
 }
 .faq-a-inner {
   padding: 0 4px 22px;

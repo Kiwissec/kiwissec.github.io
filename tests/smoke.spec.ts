@@ -7,6 +7,7 @@ import { test, expect } from "@playwright/test";
 import { loadCollection } from "../src/data/_loadCollection.js";
 import { footer, resources } from "../src/data/site";
 import { COURSE_CAT_IDS, COURSE_CAT_META } from "../src/data/course-cats";
+import { GA4_MEASUREMENT_ID } from "../src/lib/analytics";
 
 // 在收集測試的 module scope 載入：collection 缺失或為空時，原始
 // ENOENT / undefined 取值會讓整個 suite 以無指引的 stack trace 崩潰；
@@ -288,6 +289,22 @@ test("font awesome stylesheet loads without blocking render", async ({
     /rel="preload" as="style"[^>]*font-awesome[^>]*onload="[^"]*rel='stylesheet'/,
   );
   expect(html).toMatch(/<noscript>[\s\S]*?font-awesome[\s\S]*?<\/noscript>/);
+});
+
+test("the page emits a host-guarded GA4 tag with the configured measurement id", async ({
+  request,
+}) => {
+  // The gtag.js loader + config are injected but guarded so they only fire on the
+  // production host — preview / CI run on 127.0.0.1 and never send a hit. Assert
+  // from the emitted HTML so the test never depends on Google's CDN being
+  // reachable, and read the id from the same module the page does so the two
+  // can't drift.
+  const html = await (await request.get("/")).text();
+  expect(html).toContain(`gtag/js?id=${GA4_MEASUREMENT_ID}`);
+  expect(html).toContain(`gtag('config','${GA4_MEASUREMENT_ID}')`);
+  expect(html, "GA4 tag must stay host-guarded").toContain(
+    "location.hostname!==",
+  );
 });
 
 test("the footer tel link dials the international (E.164) number", async ({

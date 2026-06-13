@@ -2,6 +2,7 @@
 import "../styles/site.css";
 import { absoluteUrl, withBase } from "../lib/site";
 import { footer } from "../data/site";
+import { GA4_MEASUREMENT_ID, ga4Snippet } from "../lib/analytics";
 
 interface Props {
   title: string;
@@ -19,6 +20,13 @@ interface Props {
 const { title, description, path, noindex = false } = Astro.props;
 const canonical = absoluteUrl(path, Astro.site);
 const ogImage = absoluteUrl("/assets/og_image.webp", Astro.site);
+
+// GA4 tag: the snippet self-guards on the production host, so it only ever
+// fires on the live domain (dev / preview / CI emit an inert script). The host
+// comes from astro.config `site`, keeping the domain single-sourced.
+const gaSnippet = Astro.site
+  ? ga4Snippet(GA4_MEASUREMENT_ID, Astro.site.hostname)
+  : null;
 
 // Base-aware hexagon background for .hero-hex / .page-head (so it resolves
 // correctly even if the site is served from a sub-path).
@@ -51,6 +59,12 @@ const orgLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /* GA4 tag, high in <head> per Google's guidance; raw HTML so the inline
+       gtag script is emitted verbatim (not bundled). Fires only on the live
+       host (self-guarded) — see src/lib/analytics.ts. */
+    }
+    {gaSnippet && <Fragment set:html={gaSnippet} />}
     <title>{title}</title>
     <meta name="description" content={description} />
     {!noindex && <link rel="canonical" href={canonical} />}

@@ -187,6 +187,109 @@ test.describe("canonical and og:url name the final trailing-slash URL", () => {
   }
 });
 
+test("every indexed page exposes a unique title and non-empty description", async ({
+  page,
+}) => {
+  // Guards SEO metadata integrity: duplicate or missing titles/descriptions
+  // dilute relevance signals. Reuses the canonical route list above.
+  const seen = new Map<string, string>();
+  for (const route of routes) {
+    await page.goto(route);
+    const title = (await page.title()).trim();
+    expect(title, `${route} should have a non-empty <title>`).not.toBe("");
+    const desc = (
+      await page.locator('meta[name="description"]').getAttribute("content")
+    )?.trim();
+    expect(
+      desc,
+      `${route} should have a non-empty meta description`,
+    ).toBeTruthy();
+    expect(
+      seen.has(title),
+      `${route} title "${title}" duplicates ${seen.get(title)}`,
+    ).toBe(false);
+    seen.set(title, route);
+  }
+});
+
+test("course and legal pages carry a BreadcrumbList matching the visible trail", async ({
+  page,
+}) => {
+  await page.goto(`/courses/${courses[0].id}/`);
+  let lds = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "{}")));
+  const courseCrumb = lds.find((o) => o["@type"] === "BreadcrumbList");
+  expect(courseCrumb, "course detail has a BreadcrumbList").toBeTruthy();
+  expect(courseCrumb.itemListElement[0].name).toBe("首頁");
+  expect(
+    courseCrumb.itemListElement.map((i: { name: string }) => i.name),
+  ).toContain("企業資安課程");
+
+  await page.goto("/policy/");
+  lds = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "{}")));
+  const legalCrumb = lds.find((o) => o["@type"] === "BreadcrumbList");
+  expect(legalCrumb, "legal page has a BreadcrumbList").toBeTruthy();
+  expect(
+    legalCrumb.itemListElement.map((i: { name: string }) => i.name),
+  ).toContain("隱私權政策");
+});
+
+test("course detail pages carry Course structured data", async ({ page }) => {
+  const c = courses[0];
+  await page.goto(`/courses/${c.id}/`);
+  const lds = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "{}")));
+  const course = lds.find((o) => o["@type"] === "Course");
+  expect(course, "course detail has a Course node").toBeTruthy();
+  expect(course.name).toBe(c.title);
+  expect(course.description).toBeTruthy();
+  expect(course.provider?.name).toContain("七維思");
+});
+
+test("the site-wide Organization node identifies an education provider", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const lds = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "{}")));
+  const org = lds.find((o) => [o["@type"]].flat().includes("Organization"));
+  expect(org, "homepage has an Organization node").toBeTruthy();
+  expect([org["@type"]].flat()).toContain("EducationalOrganization");
+  expect(org.name).toContain("七維思");
+});
+
+test("content images declare explicit dimensions to reserve layout space", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const sel of [".deco-saturn", ".deco-rocket"]) {
+    await expect(page.locator(sel)).toHaveAttribute("width", /\d+/);
+    await expect(page.locator(sel)).toHaveAttribute("height", /\d+/);
+  }
+  await page.goto("/news/");
+  const thumb = page.locator(".news-thumb").first();
+  await expect(thumb).toHaveAttribute("width", /\d+/);
+  await expect(thumb).toHaveAttribute("height", /\d+/);
+});
+
+test("font awesome stylesheet loads without blocking render", async ({
+  request,
+}) => {
+  // Assert the loading strategy from the emitted HTML so the test never depends
+  // on the CDN being reachable: the icon stylesheet is preloaded as a style and
+  // swapped to rel=stylesheet on load, with a <noscript> stylesheet fallback.
+  const html = await (await request.get("/")).text();
+  expect(html).toMatch(
+    /rel="preload" as="style"[^>]*font-awesome[^>]*onload="[^"]*rel='stylesheet'/,
+  );
+  expect(html).toMatch(/<noscript>[\s\S]*?font-awesome[\s\S]*?<\/noscript>/);
+});
+
 test("the footer tel link dials the international (E.164) number", async ({
   page,
 }) => {

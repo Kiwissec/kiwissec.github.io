@@ -27,8 +27,10 @@ const hexBg = `url('${withBase("/assets/bg.webp")}')`;
 // Organization structured data (SEO). sameAs from the footer social links.
 const orgLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": ["Organization", "EducationalOrganization"],
   name: "七維思股份有限公司 Kiwissec",
+  description:
+    "七維思（Kiwissec）專注企業資安教育訓練，提供資安意識、攻防演練與資安防護課程，以及顧問諮詢與檢測服務（弱點掃描、滲透測試、社交工程）。",
   url: Astro.site ? Astro.site.href : canonical,
   logo: absoluteUrl("/assets/logos/lockup-stacked-hat-gold.png", Astro.site),
   email: footer.email,
@@ -40,6 +42,7 @@ const orgLd = {
     streetAddress: "中山區復興北路48號7樓",
   },
   sameAs: footer.socials.map(([, href]) => href),
+  areaServed: "TW",
 };
 ---
 
@@ -55,7 +58,7 @@ const orgLd = {
     <link rel="icon" href={withBase("/assets/logo.ico")} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="七維思 Kiwis" />
+    <meta property="og:site_name" content="七維思 Kiwissec" />
     <meta property="og:locale" content="zh_TW" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -68,7 +71,9 @@ const orgLd = {
 
     <!-- Fonts (v1: CDN; self-hosting tracked as follow-up) + Font Awesome.
          Stylesheets are version-pinned with SRI (immutable versioned URLs);
-         bumping a version requires recomputing the integrity hash. -->
+         bumping a version requires recomputing the integrity hash. The icon
+         stylesheet is loaded non-render-blocking (preload + onload swap) with
+         a <noscript> fallback, so icons never delay first paint. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
@@ -77,12 +82,21 @@ const orgLd = {
       integrity="sha384-KPXr9DpeoVjpiUvGwWHz7/C1vx0Bl1RPbLJgGcHloj7YQBi7PBDlKHA3ilDDIeYu"
       crossorigin="anonymous"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-      crossorigin="anonymous"
+    {
+      /* Emitted as raw HTML so the inline onload swap handler isn't type-checked
+       by astro check (it flags inline this.* assignments as ts 6133). */
+    }
+    <Fragment
+      set:html={`<link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">`}
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous"
+      />
+    </noscript>
 
     <script
       type="application/ld+json"

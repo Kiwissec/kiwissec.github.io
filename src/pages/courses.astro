@@ -5,9 +5,15 @@ import CoursesCatalog from "../components/CoursesCatalog.astro";
 import Contact from "../components/Contact.astro";
 import Footer from "../components/Footer.astro";
 
-const title = "企業資安課程 — 七維思 Kiwis";
+const title = "企業資安課程 — 七維思 Kiwissec";
 const description =
   "為企業與組織量身打造的資安內訓課程：全員資安意識、攻防演練（滲透測試、紅隊、網站與物聯網安全）與資安防護（資安維運、DevSecOps、雲端、事件應變），皆可依產業與角色客製。";
+
+// No ItemList/CollectionPage JSON-LD here on purpose: Google's Course list rich
+// result requires each course to carry hasCourseInstance/offers, which we
+// deliberately omit (B2B custom training has no fixed schedule or price — see
+// src/lib/jsonld.ts). Without those it cannot qualify, so a list wrapper would
+// be inert markup. Per-course Course entity markup lives on /courses/<id>.
 ---
 
 <Base title={title} description={description} path="/courses">

@@ -6,6 +6,7 @@ import Footer from "../../components/Footer.astro";
 import { courseCats } from "../../data/site";
 import { COURSE_CAT_META } from "../../data/course-cats";
 import { withBase } from "../../lib/site";
+import { breadcrumbLd, courseLd } from "../../lib/jsonld";
 
 export async function getStaticPaths() {
   const courses = await getCollection("courses");
@@ -20,7 +21,23 @@ const { course } = Astro.props;
 const c = course.data;
 
 const catLabel = courseCats.find((x) => x.id === c.cat)?.label ?? "";
-const title = `${c.title} — 企業資安課程 — 七維思 Kiwis`;
+const title = `${c.title} — 企業資安課程 — 七維思 Kiwissec`;
+
+// Mirrors the visible .crumbs nav (首頁 / 企業資安課程 / 分類); the category
+// step links to the courses page filtered to that category (a real deep-link).
+const breadcrumb = breadcrumbLd(
+  [
+    { name: "首頁", path: "/" },
+    { name: "企業資安課程", path: "/courses" },
+    { name: catLabel, path: `/courses/?cat=${c.cat}` },
+  ],
+  Astro.site,
+);
+
+const courseSchema = courseLd(
+  { title: c.title, desc: c.desc, tags: c.tags, objectives: c.objectives },
+  Astro.site,
+);
 
 // `intro` 為純文字欄位，以空行分段後逐段渲染（純文字，不用 set:html）。
 const introParas = (c.intro ?? "")
@@ -30,6 +47,18 @@ const introParas = (c.intro ?? "")
 ---
 
 <Base title={title} description={c.desc} path={`/courses/${course.id}`}>
+  <script
+    type="application/ld+json"
+    is:inline
+    slot="head"
+    set:html={JSON.stringify(breadcrumb)}
+  />
+  <script
+    type="application/ld+json"
+    is:inline
+    slot="head"
+    set:html={JSON.stringify(courseSchema)}
+  />
   <Navbar />
 
   <main id="main">

@@ -1,12 +1,10 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
-// 部署目標：kiwissec.com（自訂 apex 網域；DNS/Cloudflare → GitHub Pages origin，
-// 服務於站台根目錄，故 base 為 '/'）。`site` 供 canonical / Open Graph / sitemap
-// 產生絕對網址；自訂網域由 public/CNAME 指定。舊 WordPress 網址的 301 對應見
-// docs/migration-redirects.md（Cloudflare Bulk Redirects）。
-// 若需先於本 repo 以「專案頁」（.../Official-website/）預覽，請暫時把 base 改為
-// '/Official-website/'（root-absolute 的資產路徑也需一併調整，故正式目標維持 root）。
+// 部署目標：kiwissec.com（自訂 apex 網域，服務於站台根目錄，故 base 為 '/'）。
+// `site` 供 canonical / Open Graph / sitemap 產生絕對網址；自訂網域由 public/CNAME 指定。
+// 若需以 GitHub「專案頁」（.../<repo>/）預覽，請暫時把 base 改為 '/<repo>/'
+// （root-absolute 的資產路徑也需一併調整，故正式目標維持 root）。
 export default defineConfig({
   site: "https://kiwissec.com",
   base: "/",

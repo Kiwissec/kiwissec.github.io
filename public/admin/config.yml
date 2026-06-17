@@ -1,11 +1,5 @@
 # Sveltia CMS configuration for the Kiwissec site.
 #
-# Edits are committed to the PUBLIC repo (content is public-authoritative) on a
-# dedicated `content` branch — NEVER straight to `main`. A GitHub Action then
-# opens a `content` -> `main` PR so the full CI (Zod schema + content audit +
-# Playwright) gates every change before it deploys. (Sveltia has no built-in
-# editorial workflow yet, hence the branch + auto-PR pattern.)
-#
 # Each collection is stored one JSON file per entry under src/data/<collection>/
 # (see src/content.config.ts). The filename is the entry `id` (slug).
 

@@ -1,5 +1,5 @@
 // Base-path helper. Astro injects the configured `base` as import.meta.env.BASE_URL
-// (e.g. '/' for kiwissec.github.io, or '/Official-website/' if previewed as a
+// (e.g. '/' for kiwissec.com, or '/Official-website/' if previewed as a
 // project page). Prefix only internal absolute links so a base change stays a
 // single config knob — external URLs, mailto:, tel: and bare #hash pass through.
 //

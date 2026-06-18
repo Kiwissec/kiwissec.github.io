@@ -10,6 +10,10 @@ backend:
   # OAuth token-exchange worker (authorization code flow): the deployed
   # sveltia-cms-auth Cloudflare Worker. If the worker is redeployed or moved,
   # update this URL (and the GitHub OAuth App callback) together.
+  # The worker's ALLOWED_DOMAINS env var (Cloudflare dashboard, not this repo)
+  # must include the domain serving this /admin/ — currently kiwissec.com.
+  # Changing the site domain requires updating ALLOWED_DOMAINS too, or login
+  # is rejected with "Your domain is not allowed" (errorCode UNSUPPORTED_DOMAIN).
   base_url: https://sveltia-cms-auth.kiwissec.workers.dev
 
 # (Sveltia ignores Decap's `local_backend` and supports no proxy server; for

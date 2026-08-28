@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           # 與 mise.toml 的 exact pin 對齊（環境 single source of truth）；
           # bump Node 時兩處同步修改。

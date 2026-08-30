@@ -19,3 +19,8 @@ ignores:
   - "node_modules/**"
   - "dist/**"
   - ".astro/**"
+  # Playwright 產物（.gitignore 已排除）；未列在這裡的話，跑完 e2e 之後
+  # `pre-commit run --all-files` 會被 error-context.md 這類自動產生的
+  # Markdown 噴一整頁錯。
+  - "test-results/**"
+  - "playwright-report/**"

@@ -8,6 +8,19 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # 預設上限是 5 個 open 的 version-update PR，達標後 Dependabot 就不再開新
+    # PR。2026-07-31 到 08-28 的四週停擺正是撞上這個上限（astro / prettier /
+    # playwright / @astrojs/check / typescript 剛好五個）。提高到 10 讓「暫時
+    # 沒空處理」不會直接變成「連新版都不知道」。
+    open-pull-requests-limit: 10
+    groups:
+      # dev 工具的 minor / patch 合成一個 PR：它們不進 production bundle、
+      # 也不在 ci.yml `npm audit --omit=dev` 的範圍內，逐個開 PR 只是佔額度。
+      # production 依賴與任何 major 仍各自單獨開 PR，維持逐一評估。
+      dev-tooling:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
